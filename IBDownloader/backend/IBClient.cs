@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using IBApi;
-using IBSampleApp.messages;
+using IBDownloader.messages;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IBSampleApp
+namespace IBDownloader
 {
 	class IBClient : EWrapper
 	{

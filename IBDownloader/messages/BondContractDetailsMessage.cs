@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using IBApi;
 
-namespace IBSampleApp.messages
+namespace IBDownloader.messages
 {
     class BondContractDetailsMessage
     {

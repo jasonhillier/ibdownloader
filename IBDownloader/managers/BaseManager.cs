@@ -1,4 +1,4 @@
-﻿using IBSampleApp;
+﻿using IBDownloader;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,6 +29,16 @@ namespace IBDownloader.managers
 		protected T GetPendingRequestData<T>(int requestId)
 		{
 			return (T)_pendingRequestResults[requestId];
+		}
+
+		protected bool SetPendingRequestData<T>(int requestId, T Data)
+		{
+			if (CheckRequestStillPending(requestId))
+				return false;
+
+			//TODO: some type validation with original
+			_pendingRequestResults[requestId] = Data;
+			return true;
 		}
 
 		protected bool CheckRequestStillPending(int requestId)

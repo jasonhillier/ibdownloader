@@ -29,6 +29,7 @@ namespace IBDownloader
 			this.Controller = Controller;
 		}
 
+		public event Action<TaskResultData> OnTaskResult;
 		public IBController Controller { get; private set; }
 
 		/// <summary>
@@ -37,7 +38,16 @@ namespace IBDownloader
 		public void Begin()
 		{
 			_AbortFlag = false;
-			_RunTasks();
+			_RunTasks().ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Begin handling tasks in background
+		/// </summary>
+		public async System.Threading.Tasks.Task BeginAsync()
+		{
+			_AbortFlag = false;
+			await _RunTasks();
 		}
 
 		/// <summary>
@@ -57,7 +67,7 @@ namespace IBDownloader
 		}
 
 		//Run tasks as they come
-		private async void _RunTasks()
+		private async System.Threading.Tasks.Task _RunTasks()
 		{
 			while (!_AbortFlag)
 			{
@@ -81,7 +91,9 @@ namespace IBDownloader
 
 						await System.Threading.Tasks.Task.Run(async () =>
 						{
-							await task.ExecuteAsync(instruction);
+							var resultData = await task.ExecuteAsync(instruction);
+							if (this.OnTaskResult != null)
+								this.OnTaskResult(resultData);
 						});
 					}
 				}

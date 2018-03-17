@@ -4,8 +4,8 @@ using System.Text;
 using System.Threading;
 using IBApi;
 using IBDownloader.managers;
-using IBSampleApp;
-using IBSampleApp.messages;
+using IBDownloader;
+using IBDownloader.messages;
 
 namespace IBDownloader
 {
@@ -22,6 +22,7 @@ namespace IBDownloader
 
 			this.IsConnected = false;
 			this.AccountManager = new AccountManager(_ibClient);
+			this.ContractManager = new ContractManager(_ibClient);
 		}
 
 		public void Connect()
@@ -49,6 +50,7 @@ namespace IBDownloader
 
 		public bool IsConnected { get; private set; }
 		public AccountManager AccountManager { get; private set; }
+		public ContractManager ContractManager { get; private set; }
 
 		private void HandleMessage(ConnectionStatusMessage m)
 		{

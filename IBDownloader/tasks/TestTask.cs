@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using IBApi;
 
 namespace IBDownloader.tasks
 {
@@ -13,10 +14,9 @@ namespace IBDownloader.tasks
 
 		}
 
-		public override async System.Threading.Tasks.Task ExecuteAsync(IBDTaskInstruction instruction)
+		public override async System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction instruction)
 		{
-			Framework.Log("== Requesting Account Info ==");
-			var accSummary = await _TaskHandler.Controller.AccountManager.GetAccountSummary();
+			var accSummary = await _Controller.AccountManager.GetAccountSummary();
 
 			accSummary.All((i) =>
 			{
@@ -24,6 +24,19 @@ namespace IBDownloader.tasks
 				Framework.DebugPrint(i.Value);
 				return true;
 			});
+
+
+			var contract = new Contract()
+				{
+					Symbol = "SPY",
+					SecType = "STOCK"
+				};
+			ContractDetails details = await _Controller.ContractManager.GetContractDetails(contract);
+
+			Framework.Log("CONTRACT INFO");
+			Framework.Log(details.Cusip);
+
+			return new TaskResultData(instruction, true, accSummary);
 		}
     }
 }
