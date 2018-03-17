@@ -6,7 +6,6 @@ using IBApi;
 using IBDownloader.managers;
 using IBSampleApp;
 using IBSampleApp.messages;
-using System.Linq;
 
 namespace IBDownloader
 {
@@ -14,7 +13,6 @@ namespace IBDownloader
 	{
 		protected IBClient _ibClient;
 		private EReaderMonitorSignal _signal = new EReaderMonitorSignal();
-		private Queue<string> _commandQueue = new Queue<string>();
 
 		public IBController()
 		{
@@ -22,6 +20,7 @@ namespace IBDownloader
 			_ibClient.ConnectionClosed += _ibClient_ConnectionClosed;
 			_ibClient.NextValidId += HandleMessage;
 
+			this.IsConnected = false;
 			this.AccountManager = new AccountManager(_ibClient);
 		}
 
@@ -29,18 +28,17 @@ namespace IBDownloader
 		{
 			try
 			{
-				_ibClient.ClientId = 1;
+				Framework.Log("Connecting to IB gateway on localhost:4001...");
+
+				_ibClient.ClientId = 21;
 				_ibClient.ClientSocket.eConnect("localhost", 4001, _ibClient.ClientId);
 
 				var reader = new EReader(_ibClient.ClientSocket, _signal);
 
 				reader.Start();
 
-				Console.WriteLine("con");
-
+				//process incoming tcp data
 				new Thread(() => { while (_ibClient.ClientSocket.IsConnected()) { _signal.waitForSignal(); reader.processMsgs(); } }) { IsBackground = true }.Start();
-
-				this.AddTask("wtf");
 			}
 			catch (Exception ex)
 			{
@@ -49,41 +47,23 @@ namespace IBDownloader
 			}
 		}
 
+		public bool IsConnected { get; private set; }
 		public AccountManager AccountManager { get; private set; }
-
-		public async void AddTask(string Task)
-		{
-			_commandQueue.Enqueue(Task);
-
-			Console.WriteLine("== Requesting Account Info ==");
-			var accSummary = await AccountManager.GetAccountSummary();
-
-			accSummary.All((i) =>
-			{
-				Console.WriteLine("\n{0}=", i.Key);
-				Log(i.Value);
-				return true;
-			});
-		}
 
 		private void HandleMessage(ConnectionStatusMessage m)
 		{
-			Console.WriteLine("status con:" + m.IsConnected);
+			this.IsConnected = m.IsConnected;
+			Framework.Log("Connected to IBGateway:" + m.IsConnected);
 		}
 
 		private void _ibClient_ConnectionClosed()
 		{
-			Console.WriteLine("it ded");
-		}
+			this.IsConnected = false;
+			Framework.LogError("Connection to IBGateway lost!");
 
-		static void Log(object @object)
-		{
-			foreach (var property in @object.GetType().GetProperties())
-			{
-				var value = property.GetValue(@object, null);
-				if (value != null)
-					Console.WriteLine(property.Name + ": " + value.ToString());
-			}
+			//this isn't supposed to happen
+			//TODO: maybe do some retry/reconnect handling
+			throw new Exception("Connection to IBGateway lost!");
 		}
 	}
 }

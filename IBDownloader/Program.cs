@@ -12,7 +12,13 @@ namespace IBDownloader
 			var controller = new IBController();
 			controller.Connect();
 
-            Console.WriteLine("Hello World!");
+			var taskHandler = new IBDTaskHandler(controller);
+			taskHandler.Begin();
+
+			taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
+			Console.WriteLine("Hello World!");
+			taskHandler.AddTask(new IBDTaskInstruction("thing 2"));
+
 			Console.ReadLine();
         }
 	}

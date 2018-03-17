@@ -1,66 +1,50 @@
-﻿using IBSampleApp;
+﻿using IBApi;
+using IBSampleApp;
 using IBSampleApp.messages;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace IBDownloader.managers
 {
-    class AccountManager
-    {
-		protected IBClient _ibClient;
-		private const int ACCOUNT_ID_BASE = 50000000;
-		private const int ACCOUNT_SUMMARY_ID = ACCOUNT_ID_BASE + 1;
-		private const string ACCOUNT_SUMMARY_TAGS = "AccountType,NetLiquidation,TotalCashValue,SettledCash,AccruedCash,BuyingPower,EquityWithLoanValue,PreviousEquityWithLoanValue,"
-			 + "GrossPositionValue,ReqTEquity,ReqTMargin,SMA,InitMarginReq,MaintMarginReq,AvailableFunds,ExcessLiquidity,Cushion,FullInitMarginReq,FullMaintMarginReq,FullAvailableFunds,"
-			 + "FullExcessLiquidity,LookAheadNextChange,LookAheadInitMarginReq ,LookAheadMaintMarginReq,LookAheadAvailableFunds,LookAheadExcessLiquidity,HighestSeverity,DayTradesRemaining,Leverage";
-
-		private TypeMergerPolicy _merge = new TypeMergerPolicy();
-		private int _lastRequestIdCompleted;
-		private object _lastRequestData;
-
+    class AccountManager : BaseManager
+	{
 		public AccountManager(IBClient ibClient)
+			: base(ibClient)
 		{
-			_ibClient = ibClient;
-
 			_ibClient.AccountSummary += _ibClient_AccountSummary;
 			_ibClient.AccountSummaryEnd += _ibClient_AccountSummaryEnd;
 		}
 
 		private void _ibClient_AccountSummaryEnd(AccountSummaryEndMessage obj)
 		{
-			_lastRequestIdCompleted = obj.RequestId;
+			this.MarkCompleted(obj.RequestId);
 		}
 
-		public async Task<Dictionary<string, AccountSummaryMessage>> GetAccountSummary()
+		public async Task<ConcurrentDictionary<string, AccountSummaryMessage>> GetAccountSummary()
 		{
-			var job = Dispatch<AccountSummaryMessage>(ACCOUNT_SUMMARY_ID);
+			int requestId = this.GetNextTaskId();
+			var job = this.Dispatch<ConcurrentDictionary<string, AccountSummaryMessage>>(requestId).GetAwaiter();
 
-			_ibClient.ClientSocket.reqAccountSummary(ACCOUNT_SUMMARY_ID, "All", ACCOUNT_SUMMARY_TAGS);
+			_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
 
-			return await job.GetAwaiter().GetResult();
-		}
-
-		private async Task<Dictionary<string, T>> Dispatch<T>(int pendingTaskId)
-		{
-			Dictionary<string, T> data = new Dictionary<string, T>();
-			_lastRequestData = data;
-			//_lastRequestIdCompleted = 0;
-			//TODO: mutex/interlock
-			while (_lastRequestIdCompleted != pendingTaskId)
+			while (!job.IsCompleted)
 			{
-				await Task.Delay(1000);
+				await Task.Delay(100);
 			}
 
-
-			return data;
+			return job.GetResult();
 		}
 
-		private void _ibClient_AccountSummary(AccountSummaryMessage obj)
+		private void _ibClient_AccountSummary(AccountSummaryMessage message)
 		{
-			var data = (Dictionary<string, AccountSummaryMessage>)_lastRequestData;
-			data[obj.Tag] = obj;
+			if (this.CheckRequestStillPending(message.RequestId))
+			{
+				var data = this.GetPendingRequestData<ConcurrentDictionary<string, AccountSummaryMessage>>(message.RequestId);
+				data[message.Tag] = message;
+			}
 		}
     }
 }
