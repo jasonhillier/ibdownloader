@@ -8,8 +8,12 @@ namespace IBDownloader
     {
 		static Framework()
 		{
-
+			Framework.Settings = new SettingsData();
 		}
+
+		public static SettingsData Settings { get; private set; }
+
+		#region Logging
 
 		public static void LogError(string format, params object[] args)
 		{
@@ -41,6 +45,41 @@ namespace IBDownloader
 				if (value != null)
 					Console.WriteLine(property.Name + ": " + value.ToString());
 			}
+		}
+
+		#endregion
+	}
+
+	class SettingsData
+	{
+		//TODO: command-line parser
+
+		public string this[string key]
+		{
+			get
+			{
+				return Environment.GetEnvironmentVariable(key);
+			}
+		}
+
+		public string Get(string key, string defaultValue)
+		{
+			var value = this[key];
+			if (String.IsNullOrEmpty(value))
+				value = defaultValue;
+
+			return value;
+		}
+
+		public int Get(string key, int defaultValue)
+		{
+			var value = this[key];
+
+			int result;
+			if (int.TryParse(value, out result))
+				return result;
+			else
+				return defaultValue;
 		}
 	}
 }

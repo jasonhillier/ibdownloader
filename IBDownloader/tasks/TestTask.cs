@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using IBApi;
 
-namespace IBDownloader.tasks
+namespace IBDownloader.Tasks
 {
     class TestTask : BaseTask
     {

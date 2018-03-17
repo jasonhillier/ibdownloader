@@ -14,7 +14,9 @@ namespace IBDownloader
 
 			var taskHandler = new IBDTaskHandler(controller);
 			taskHandler.Begin();
-			taskHandler.OnTaskResult += TaskHandler_OnTaskResult;
+
+			var elasticsearch = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.StockQuoteProcessor());
+			taskHandler.OnTaskResult += elasticsearch.ProcessTaskResultAsync;
 
 			taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
 			Console.WriteLine("Hello World!");
@@ -22,10 +24,5 @@ namespace IBDownloader
 
 			Console.ReadLine();
         }
-
-		private static void TaskHandler_OnTaskResult(tasks.TaskResultData obj)
-		{
-			Console.WriteLine("hey stuff=" + obj.Data.GetType().Name);
-		}
 	}
 }

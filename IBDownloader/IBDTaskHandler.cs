@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using IBDownloader.tasks;
+using IBDownloader.Tasks;
 using System.Reflection;
 
 namespace IBDownloader

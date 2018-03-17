@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IBDownloader.tasks
+namespace IBDownloader.Tasks
 {
 	class TaskResultData
 	{
