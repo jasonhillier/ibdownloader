@@ -23,7 +23,13 @@ namespace IBDownloader
 			this.IsConnected = false;
 			this.AccountManager = new AccountManager(_ibClient);
 			this.ContractManager = new ContractManager(_ibClient);
+			this.HistoricalDataManager = new HistoricalDataManager(_ibClient);
 		}
+
+		public bool IsConnected { get; private set; }
+		public AccountManager AccountManager { get; private set; }
+		public ContractManager ContractManager { get; private set; }
+		public HistoricalDataManager HistoricalDataManager { get; private set; }
 
 		public void Connect()
 		{
@@ -47,10 +53,6 @@ namespace IBDownloader
 				//HandleErrorMessage(new ErrorMessage(-1, -1, "Please check your connection attributes."));
 			}
 		}
-
-		public bool IsConnected { get; private set; }
-		public AccountManager AccountManager { get; private set; }
-		public ContractManager ContractManager { get; private set; }
 
 		private void HandleMessage(ConnectionStatusMessage m)
 		{

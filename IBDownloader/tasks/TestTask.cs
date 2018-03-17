@@ -26,18 +26,22 @@ namespace IBDownloader.Tasks
 			});
 
 
-			var contract = new Contract()
-				{
-					Symbol = "SPY",
-					SecType = "STK",
-					Exchange = "SMART"
-				};
+			List<Contract> contracts = await _Controller.ContractManager.GetContracts("STK", "SPY");
+			var contract = contracts.First();
+
 			List<ContractDetails> details = await _Controller.ContractManager.GetContractDetails(contract);
 
 			Framework.Log("CONTRACT INFO");
 			details.All((i) =>
 			{
 				Framework.Log(i.LongName);
+				return true;
+			});
+
+			var data = await _Controller.HistoricalDataManager.GetHistoricalData(contract, DateTime.Now, Managers.BarSize.M15);
+			data.All((bar) =>
+			{
+				Console.WriteLine("{0} close={1}", bar.Date, bar.Close);
 				return true;
 			});
 

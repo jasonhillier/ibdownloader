@@ -19,7 +19,7 @@ namespace IBDownloader.Managers
 			_ibClient.ContractDetailsEnd += this.HandleEndMessage;
 		}
 
-		public async Task<List<Contract>> GetContracts(string secType, string symbol, string currency, string exchange)
+		public async Task<List<Contract>> GetContracts(string secType, string symbol, string currency = null, string exchange = "SMART")
 		{
 			Contract[] contracts = await _ibClient.ResolveContractAsync(secType, symbol, currency, exchange);
 			return new List<Contract>(contracts);
