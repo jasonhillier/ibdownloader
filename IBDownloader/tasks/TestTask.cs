@@ -26,7 +26,7 @@ namespace IBDownloader.Tasks
 			});
 
 
-			List<Contract> contracts = await _Controller.ContractManager.GetContracts("STK", "SPY");
+			List<Contract> contracts = await _Controller.ContractManager.GetContracts(Managers.SecurityType.STK, "SPY");
 			var contract = contracts.First();
 
 			List<ContractDetails> details = await _Controller.ContractManager.GetContractDetails(contract);
@@ -38,12 +38,27 @@ namespace IBDownloader.Tasks
 				return true;
 			});
 
+			var optionProfiles = await _Controller.OptionManager.GetOptionProfiles(contract);
+			optionProfiles.All((profile) =>
+			{
+				Framework.Log("Option profile for SPY on {0}", profile.Exchange);
+				Framework.Log("STRIKES");
+				profile.Strikes.All((s) =>
+				{
+					Framework.Log(s.ToString());
+					return true;
+				});
+				return true;
+			});
+
+			Framework.Log("req hist data...");
 			var data = await _Controller.HistoricalDataManager.GetHistoricalData(contract, DateTime.Now, Managers.BarSize.M15);
 			data.All((bar) =>
 			{
-				Console.WriteLine("{0} close={1}", bar.Date, bar.Close);
+				Framework.Log("{0} close={1}", bar.Date, bar.Close);
 				return true;
 			});
+
 
 			return new TaskResultData(instruction, true, accSummary);
 		}

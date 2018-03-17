@@ -7,9 +7,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using IBDownloader.messages;
 using IBApi;
+using System.Linq;
 
 namespace IBDownloader.Managers
 {
+	enum SecurityType
+	{
+		STK,
+		OPT,
+		FUT,
+		IND,
+		FOP,
+		CASH,
+		BAG,
+		WAR,
+		BOND,
+		CMDTY,
+		NEWS,
+		FUND
+	}
 	class ContractManager : BaseManager
 	{
 		public ContractManager(IBClient ibClient)
@@ -19,10 +35,21 @@ namespace IBDownloader.Managers
 			_ibClient.ContractDetailsEnd += this.HandleEndMessage;
 		}
 
-		public async Task<List<Contract>> GetContracts(string secType, string symbol, string currency = null, string exchange = "SMART")
+		public async Task<List<Contract>> GetContracts(SecurityType secType, string symbol, string currency = "USD", string exchange = "SMART")
 		{
-			Contract[] contracts = await _ibClient.ResolveContractAsync(secType, symbol, currency, exchange);
-			return new List<Contract>(contracts);
+			var contractSearch = new Contract()
+			{
+				Symbol = symbol,
+				SecType = secType.ToString(),
+				Currency = currency,
+				Exchange = exchange
+			};
+
+			var contractDetails = await GetContractDetails(contractSearch);
+			return contractDetails.ConvertAll<Contract>((c) =>
+			{
+				return c.Summary;
+			});
 		}
 
 		public async Task<List<ContractDetails>> GetContractDetails(Contract Contract)

@@ -19,7 +19,7 @@ namespace IBDownloader
 			taskHandler.OnTaskResult += elasticsearch.ProcessTaskResultAsync;
 
 			taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
-			Console.WriteLine("Hello World!");
+			Console.WriteLine("Waiting for tasks...");
 			taskHandler.AddTask(new IBDTaskInstruction("thing 2"));
 
 			Console.ReadLine();

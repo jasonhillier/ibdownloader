@@ -24,12 +24,14 @@ namespace IBDownloader
 			this.AccountManager = new AccountManager(_ibClient);
 			this.ContractManager = new ContractManager(_ibClient);
 			this.HistoricalDataManager = new HistoricalDataManager(_ibClient);
+			this.OptionManager = new OptionManager(_ibClient);
 		}
 
 		public bool IsConnected { get; private set; }
 		public AccountManager AccountManager { get; private set; }
 		public ContractManager ContractManager { get; private set; }
 		public HistoricalDataManager HistoricalDataManager { get; private set; }
+		public OptionManager OptionManager { get; private set; }
 
 		public void Connect()
 		{
@@ -37,7 +39,7 @@ namespace IBDownloader
 			{
 				Framework.Log("Connecting to IB gateway on localhost:4001...");
 
-				_ibClient.ClientId = 21;
+				_ibClient.ClientId = 11;
 				_ibClient.ClientSocket.eConnect("localhost", 4001, _ibClient.ClientId);
 
 				var reader = new EReader(_ibClient.ClientSocket, _signal);

@@ -20,6 +20,11 @@ namespace IBDownloader
 			Log("ERROR " + format, args);
 		}
 
+		public static void LogWarn(string format, params object[] args)
+		{
+			Log("WARN " + format, args);
+		}
+
 		public static void Log(string format, params object[] args)
 		{
 			if (format.StartsWith("["))

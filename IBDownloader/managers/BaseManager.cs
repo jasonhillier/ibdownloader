@@ -15,10 +15,11 @@ namespace IBDownloader.Managers
 	}
 	abstract class BaseManager
 	{
+		const int WAIT_TIMEOUT = 15; //no responses for x seconds
 		protected IBClient _ibClient;
 		private static int _requestIdCounter = 1;
 		private ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>> _pendingRequestResults = new ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>>();
-		private ConcurrentDictionary<int, bool> _pendingRequestStatus = new ConcurrentDictionary<int, bool>();
+		private ConcurrentDictionary<int, DateTime> _pendingRequestStatus = new ConcurrentDictionary<int, DateTime>();
 
 		public BaseManager(IBClient ibClient)
 		{
@@ -40,8 +41,10 @@ namespace IBDownloader.Managers
 
 		protected bool SetPendingRequestData<T>(int requestId, List<T> Data) where T : IBMultiMessageData
 		{
-			if (!CheckRequestStillPending(requestId))
+			if (!CheckRequestStillPending(requestId, typeof(T)))
 				return false;
+
+			ResetPendingRequestTimeout(requestId);
 
 			ConcurrentBag<IBMultiMessageData> dataList = new ConcurrentBag<IBMultiMessageData>();
 			Data.All((i) =>
@@ -56,44 +59,65 @@ namespace IBDownloader.Managers
 
 		protected void AppendPendingRequestData<T>(T DataMessage) where T : IBMultiMessageData
 		{
-			if (!CheckRequestStillPending(DataMessage.RequestId))
+			if (!CheckRequestStillPending(DataMessage.RequestId, typeof(T)))
 				return;
+
+			ResetPendingRequestTimeout(DataMessage.RequestId);
 
 			//TODO: some type validation with original
 			_pendingRequestResults[DataMessage.RequestId].Add(DataMessage);
 			return;
 		}
 
-		protected bool CheckRequestStillPending(int requestId)
+		protected bool CheckRequestStillPending(int requestId, Type ExpectedMessageType = null)
 		{
 			var isPending = _pendingRequestStatus.ContainsKey(requestId) &&
-							!_pendingRequestStatus[requestId];
+							_pendingRequestStatus[requestId] != DateTime.MinValue;
 
 			if (!isPending)
 			{
-				Framework.LogError("Request {0} was already completed!", requestId);
+				if (ExpectedMessageType == null)
+					ExpectedMessageType = typeof(System.DBNull);
+
+				Framework.LogWarn("Request {0} for {1} was already completed!", requestId, ExpectedMessageType.Name);
 			}
 
 			return isPending;
 		}
 
-		private void _ibClient_Error(int arg1, int arg2, string arg3, Exception arg4)
+		protected void ResetPendingRequestTimeout(int requestId)
+		{
+			if (_pendingRequestStatus.ContainsKey(requestId) &&
+				_pendingRequestStatus[requestId] != DateTime.MinValue)
+			{
+				_pendingRequestStatus[requestId] = DateTime.Now;
+			}
+		}
+
+		private void _ibClient_Error(int reqId, int arg2, string arg3, Exception arg4)
 		{
 			//indicate that this request id is done doing whatever it was supposed to do
-			_pendingRequestStatus[arg1] = true;
+			_pendingRequestStatus[reqId] = DateTime.MinValue;
 
 			//all we can do really
-			Console.WriteLine("IB ERROR: {0} {1} {2} {3}", arg1, arg2, arg3, arg4);
+			Framework.Log("IB ERROR: {0} {1} {2} {3}", reqId, arg2, arg3, arg4);
+
+			//assume that IB won't send anything more related to this request
+			HandleEndMessage(reqId);
 		}
 
 		protected void HandleEndMessage(int requestId)
 		{
-			_pendingRequestStatus[requestId] = true;
+			Task.Delay(100).Wait(); //make sure enough time is give to process related messages
+
+			_pendingRequestStatus[requestId] = DateTime.MinValue;
 		}
 
 		protected void HandleEndMessage(IBMultiMessageData EndMessage)
 		{
-			_pendingRequestStatus[EndMessage.RequestId] = true;
+			Task.Delay(100).Wait(); //make sure enough time is give to process related messages
+
+			_pendingRequestStatus[EndMessage.RequestId] = DateTime.MinValue;
 		}
 
 		protected async Task<List<T>> Dispatch<T>(Func<int, bool> initiator) where T : IBMultiMessageData
@@ -115,20 +139,26 @@ namespace IBDownloader.Managers
 			return job.GetResult();
 		}
 
-		protected async Task<List<T>> Dispatch<T>(int taskId) where T : IBMultiMessageData
+		protected async Task<List<T>> Dispatch<T>(int requestId) where T : IBMultiMessageData
 		{
-			_pendingRequestResults[taskId] = new ConcurrentBag<IBMultiMessageData>();
-			_pendingRequestStatus[taskId] = false;
+			_pendingRequestResults[requestId] = new ConcurrentBag<IBMultiMessageData>();
+			_pendingRequestStatus[requestId] = DateTime.Now;
 
-			//TODO: timeout handler
-			while (!_pendingRequestStatus[taskId])
+			
+			while (_pendingRequestStatus[requestId] != DateTime.MinValue)
 			{
 				await Task.Delay(1000);
+
+				if ((DateTime.Now - _pendingRequestStatus[requestId]).TotalSeconds > WAIT_TIMEOUT &&
+					_pendingRequestStatus[requestId] != DateTime.MinValue)
+				{
+					Framework.LogError("Request {0} of {1} timed out.", requestId, typeof(T).Name);
+				}
 			}
 
-			_pendingRequestStatus.Remove(taskId, out _);
+			_pendingRequestStatus.Remove(requestId, out _);
 			ConcurrentBag<IBMultiMessageData> data = null;
-			_pendingRequestResults.Remove(taskId, out data);
+			_pendingRequestResults.Remove(requestId, out data);
 			
 			return data.ToList().ConvertAll((i)=>
 			{

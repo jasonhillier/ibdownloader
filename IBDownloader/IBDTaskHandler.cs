@@ -91,7 +91,21 @@ namespace IBDownloader
 
 						await System.Threading.Tasks.Task.Run(async () =>
 						{
-							var resultData = await task.ExecuteAsync(instruction);
+							TaskResultData resultData;
+							try
+							{
+								resultData = await task.ExecuteAsync(instruction);
+							}
+							catch (Exception ex)
+							{
+								Framework.LogError("Error in task for instruction {0}", instruction.TaskType);
+								Framework.LogError(ex.Message);
+								Framework.LogError(ex.StackTrace);
+								return;
+							}
+
+							Framework.Log("Completed task for instruction {0}", instruction.TaskType);
+
 							if (this.OnTaskResult != null)
 								this.OnTaskResult(resultData);
 						});
