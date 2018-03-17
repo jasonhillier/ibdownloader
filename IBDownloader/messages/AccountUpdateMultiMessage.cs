@@ -8,8 +8,8 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class AccountUpdateMultiMessage 
-    {
+    class AccountUpdateMultiMessage : Managers.IBMultiMessageData
+	{
         private int reqId;
         private string account;
         private string modelCode;
@@ -17,8 +17,9 @@ namespace IBDownloader.messages
         private string value;
         private string currency;
         
-        public AccountUpdateMultiMessage(int reqId, string account, string modelCode, string key, string value, string currency)
+        public AccountUpdateMultiMessage(int ReqId, string account, string modelCode, string key, string value, string currency)
         {
+			reqId = ReqId;
             Account = account;
             ModelCode = modelCode;
             Key = key;
@@ -26,7 +27,7 @@ namespace IBDownloader.messages
             Currency = currency;
         }
 
-        public int ReqId
+        public int RequestId
         {
             get { return reqId; }
             set { reqId = value; }

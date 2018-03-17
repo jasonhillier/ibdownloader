@@ -5,16 +5,16 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalTickMessage
-    {
-        public int ReqId { get; private set; }
+    class HistoricalTickMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public long Time { get; private set; }
         public double Price { get; private set; }
         public long Size { get; private set; }
 
         public HistoricalTickMessage(int reqId, long time, double price, long size)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Time = time;
             Price = price;
             Size = size;

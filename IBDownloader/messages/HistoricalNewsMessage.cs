@@ -8,8 +8,8 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class HistoricalNewsMessage
-    {
+    class HistoricalNewsMessage : Managers.IBMultiMessageData
+	{
         public int RequestId { get; private set; }
         public string Time { get; private set; }
         public string ProviderCode { get; private set; }

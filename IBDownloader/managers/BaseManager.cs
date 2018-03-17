@@ -5,14 +5,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace IBDownloader.managers
+namespace IBDownloader.Managers
 {
+	public interface IBMultiMessageData
+	{
+		int RequestId { get; }
+	}
 	abstract class BaseManager
 	{
 		protected IBClient _ibClient;
 		private static int _requestIdCounter = 1;
-		private ConcurrentDictionary<int, object> _pendingRequestResults = new ConcurrentDictionary<int, object>();
+		private ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>> _pendingRequestResults = new ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>>();
 		private ConcurrentDictionary<int, bool> _pendingRequestStatus = new ConcurrentDictionary<int, bool>();
 
 		public BaseManager(IBClient ibClient)
@@ -26,19 +31,37 @@ namespace IBDownloader.managers
 			return Interlocked.Increment(ref _requestIdCounter);
 		}
 
-		protected T GetPendingRequestData<T>(int requestId)
+		/*
+		protected T GetPendingRequestData<T>(int requestId) where T : IMessageData
 		{
 			return (T)_pendingRequestResults[requestId];
 		}
+		*/
 
-		protected bool SetPendingRequestData<T>(int requestId, T Data)
+		protected bool SetPendingRequestData<T>(int requestId, List<T> Data) where T : IBMultiMessageData
 		{
-			if (CheckRequestStillPending(requestId))
+			if (!CheckRequestStillPending(requestId))
 				return false;
 
-			//TODO: some type validation with original
-			_pendingRequestResults[requestId] = Data;
+			ConcurrentBag<IBMultiMessageData> dataList = new ConcurrentBag<IBMultiMessageData>();
+			Data.All((i) =>
+			{
+				dataList.Add(i);
+				return true;
+			});
+
+			_pendingRequestResults[requestId] = dataList;
 			return true;
+		}
+
+		protected void AppendPendingRequestData<T>(T DataMessage) where T : IBMultiMessageData
+		{
+			if (!CheckRequestStillPending(DataMessage.RequestId))
+				return;
+
+			//TODO: some type validation with original
+			_pendingRequestResults[DataMessage.RequestId].Add(DataMessage);
+			return;
 		}
 
 		protected bool CheckRequestStillPending(int requestId)
@@ -63,14 +86,19 @@ namespace IBDownloader.managers
 			Console.WriteLine("IB ERROR: {0} {1} {2} {3}", arg1, arg2, arg3, arg4);
 		}
 
-		protected void MarkCompleted(int requestId)
+		protected void HandleEndMessage(int requestId)
 		{
 			_pendingRequestStatus[requestId] = true;
 		}
 
-		protected async Task<T> Dispatch<T>(int taskId) where T : new()
+		protected void HandleEndMessage(IBMultiMessageData EndMessage)
 		{
-			_pendingRequestResults[taskId] = new T();
+			_pendingRequestStatus[EndMessage.RequestId] = true;
+		}
+
+		protected async Task<List<T>> Dispatch<T>(int taskId) where T : IBMultiMessageData
+		{
+			_pendingRequestResults[taskId] = new ConcurrentBag<IBMultiMessageData>();
 			_pendingRequestStatus[taskId] = false;
 
 			//TODO: timeout handler
@@ -80,10 +108,13 @@ namespace IBDownloader.managers
 			}
 
 			_pendingRequestStatus.Remove(taskId, out _);
-			object data = null;
+			ConcurrentBag<IBMultiMessageData> data = null;
 			_pendingRequestResults.Remove(taskId, out data);
-
-			return (T)data;
+			
+			return data.ToList().ConvertAll((i)=>
+			{
+				return (T)i;
+			});
 		}
 	}
 }

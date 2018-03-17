@@ -8,15 +8,15 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class ExecutionMessage
-    {
+    class ExecutionMessage : Managers.IBMultiMessageData
+	{
         private int reqId;
         private Contract contract;
         private Execution execution;
 
-        public ExecutionMessage(int reqId, Contract contract, Execution execution)
+        public ExecutionMessage(int ReqId, Contract contract, Execution execution)
         {
-            ReqId = reqId;
+            reqId = ReqId;
             Contract = contract;
             Execution = execution;
         }
@@ -33,7 +33,7 @@ namespace IBDownloader.messages
             set { execution = value; }
         }
 
-        public int ReqId
+        public int RequestId
         {
             get { return reqId; }
             set { reqId = value; }

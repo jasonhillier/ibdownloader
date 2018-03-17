@@ -6,15 +6,15 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class TickByTickMidPointMessage
-    {
-        public int ReqId { get; private set; }
+    class TickByTickMidPointMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public long Time { get; private set; }
         public double MidPoint { get; private set; }
 
         public TickByTickMidPointMessage(int reqId, long time, double midPoint)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Time = time;
             MidPoint = midPoint;
         }

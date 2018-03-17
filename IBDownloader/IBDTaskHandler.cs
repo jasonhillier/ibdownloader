@@ -107,7 +107,7 @@ namespace IBDownloader
 
 		public BaseTask CreateTask(string TaskType)
 		{
-			Type type = Assembly.GetExecutingAssembly().GetType("IBDownloader.tasks." + TaskType);
+			Type type = Assembly.GetExecutingAssembly().GetType("IBDownloader.Tasks." + TaskType);
 			return Activator.CreateInstance(type, this) as BaseTask;
 		}
 	}

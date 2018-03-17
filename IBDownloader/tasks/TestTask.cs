@@ -20,8 +20,8 @@ namespace IBDownloader.Tasks
 
 			accSummary.All((i) =>
 			{
-				Framework.Log("\n{0}=", i.Key);
-				Framework.DebugPrint(i.Value);
+				Framework.Log("\n{0}=", i.Tag);
+				Framework.DebugPrint(i);
 				return true;
 			});
 
@@ -29,12 +29,17 @@ namespace IBDownloader.Tasks
 			var contract = new Contract()
 				{
 					Symbol = "SPY",
-					SecType = "STOCK"
+					SecType = "STK",
+					Exchange = "SMART"
 				};
-			ContractDetails details = await _Controller.ContractManager.GetContractDetails(contract);
+			List<ContractDetails> details = await _Controller.ContractManager.GetContractDetails(contract);
 
 			Framework.Log("CONTRACT INFO");
-			Framework.Log(details.Cusip);
+			details.All((i) =>
+			{
+				Framework.Log(i.LongName);
+				return true;
+			});
 
 			return new TaskResultData(instruction, true, accSummary);
 		}

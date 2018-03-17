@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    public abstract class MarketDataMessage
-    {
+    public abstract class MarketDataMessage : Managers.IBMultiMessageData
+	{
         protected int requestId;
         protected int field;
 

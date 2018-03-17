@@ -8,8 +8,8 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class ContractDetailsMessage
-    {
+    class ContractDetailsMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
         private ContractDetails contractDetails;
         

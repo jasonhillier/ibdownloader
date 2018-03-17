@@ -6,9 +6,9 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class TickByTickAllLastMessage
-    {
-        public int ReqId { get; private set; }
+    class TickByTickAllLastMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public int TickType { get; private set; }
         public long Time { get; private set; }
         public double Price { get; private set; }
@@ -19,7 +19,7 @@ namespace IBDownloader.messages
 
         public TickByTickAllLastMessage(int reqId, int tickType, long time, double price, long size, TickAttrib attribs, string exchange, string specialConditions)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             TickType = tickType;
             Time = time;
             Price = price;

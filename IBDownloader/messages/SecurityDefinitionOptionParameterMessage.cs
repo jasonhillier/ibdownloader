@@ -5,9 +5,9 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class SecurityDefinitionOptionParameterMessage
-    {
-        public int ReqId { get; private set; }
+    class SecurityDefinitionOptionParameterMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public string Exchange { get; private set; }
         public int UnderlyingConId { get; private set; }
         public string TradingClass { get; private set; }
@@ -17,7 +17,7 @@ namespace IBDownloader.messages
 
         public SecurityDefinitionOptionParameterMessage(int reqId, string exchange, int underlyingConId, string tradingClass, string multiplier, HashSet<string> expirations, HashSet<double> strikes)
         {
-            this.ReqId = reqId;
+            this.RequestId = reqId;
             this.Exchange = exchange;
             this.UnderlyingConId = underlyingConId;
             this.TradingClass = tradingClass;

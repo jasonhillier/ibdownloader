@@ -5,14 +5,14 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistogramDataMessage
-    {
-        public int ReqId { get; private set; }
+    class HistogramDataMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public IBApi.HistogramEntry[] Data { get; private set; }
 
         public HistogramDataMessage(int reqId, IBApi.HistogramEntry[] data)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Data = data;
         }
     }

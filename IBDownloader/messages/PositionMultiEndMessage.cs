@@ -8,16 +8,16 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class PositionMultiEndMessage 
-    {
+    class PositionMultiEndMessage : Managers.IBMultiMessageData
+	{
         private int reqId;
         
         public PositionMultiEndMessage(int reqId)
         {
-            ReqId = reqId;
+            RequestId = reqId;
         }
 
-        public int ReqId
+        public int RequestId
         {
             get { return reqId; }
             set { reqId = value; }

@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class AccountSummaryEndMessage 
-    {
+    class AccountSummaryEndMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
 
         public AccountSummaryEndMessage(int requestId)

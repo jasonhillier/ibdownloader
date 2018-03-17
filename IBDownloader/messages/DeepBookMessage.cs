@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class DeepBookMessage
-    {
+    class DeepBookMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
         private int position;
         private int operation;

@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class ScannerEndMessage
-    {
+    class ScannerEndMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
 
         public ScannerEndMessage(int requestId)

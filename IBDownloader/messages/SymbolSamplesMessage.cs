@@ -8,14 +8,14 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class SymbolSamplesMessage
-    {
-        public int ReqId { get; private set; }
+    class SymbolSamplesMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public ContractDescription[] ContractDescriptions { get; private set; }
 
         public SymbolSamplesMessage(int reqId, ContractDescription[] contractDescriptions)
         {
-            this.ReqId = reqId;
+            this.RequestId = reqId;
             this.ContractDescriptions = contractDescriptions;
         }
     }

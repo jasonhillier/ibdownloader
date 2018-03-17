@@ -5,9 +5,9 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalTickBidAskMessage
-    {
-        public int ReqId { get; set; }
+    class HistoricalTickBidAskMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; set; }
         public long Time { get; set; }
         public int Mask { get; set; }
         public double PriceBid { get; set; }
@@ -17,7 +17,7 @@ namespace IBDownloader.messages
 
         public HistoricalTickBidAskMessage(int reqId, long time, int mask, double priceBid, double priceAsk, long sizeBid, long sizeAsk)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Time = time;
             Mask = mask;
             PriceBid = priceBid;

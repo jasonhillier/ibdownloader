@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalDataEndMessage
-    {
+    class HistoricalDataEndMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
         private string startDate;
         private string endDate;

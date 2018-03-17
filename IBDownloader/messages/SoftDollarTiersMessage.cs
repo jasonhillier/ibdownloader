@@ -5,14 +5,14 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class SoftDollarTiersMessage
-    {
-        public int ReqId { get; private set; }
+    class SoftDollarTiersMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public IBApi.SoftDollarTier[] Tiers { get; private set; }
 
         public SoftDollarTiersMessage(int reqId, IBApi.SoftDollarTier[] tiers)
         {
-            this.ReqId = reqId;
+            this.RequestId = reqId;
             this.Tiers = tiers;
         }
     }

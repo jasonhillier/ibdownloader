@@ -8,8 +8,8 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class PositionMultiMessage 
-    {
+    class PositionMultiMessage : Managers.IBMultiMessageData
+	{
         private int reqId;
         private string account;
         private string modelCode;
@@ -19,7 +19,7 @@ namespace IBDownloader.messages
         
         public PositionMultiMessage(int reqId, string account, string modelCode, Contract contract, double pos, double avgCost)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Account = account;
             ModelCode = modelCode;
             Contract = contract;
@@ -27,7 +27,7 @@ namespace IBDownloader.messages
             AverageCost = avgCost;
         }
 
-        public int ReqId
+        public int RequestId
         {
             get { return reqId; }
             set { reqId = value; }

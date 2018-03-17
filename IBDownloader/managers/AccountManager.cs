@@ -7,26 +7,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IBDownloader.managers
+namespace IBDownloader.Managers
 {
     class AccountManager : BaseManager
 	{
 		public AccountManager(IBClient ibClient)
 			: base(ibClient)
 		{
-			_ibClient.AccountSummary += _ibClient_AccountSummary;
-			_ibClient.AccountSummaryEnd += _ibClient_AccountSummaryEnd;
+			_ibClient.AccountSummary += this.AppendPendingRequestData;
+			_ibClient.AccountSummaryEnd += this.HandleEndMessage;
 		}
 
-		private void _ibClient_AccountSummaryEnd(AccountSummaryEndMessage obj)
-		{
-			this.MarkCompleted(obj.RequestId);
-		}
-
-		public async Task<ConcurrentDictionary<string, AccountSummaryMessage>> GetAccountSummary()
+		public async Task<List<AccountSummaryMessage>> GetAccountSummary()
 		{
 			int requestId = this.GetNextTaskId();
-			var job = this.Dispatch<ConcurrentDictionary<string, AccountSummaryMessage>>(requestId).GetAwaiter();
+			var job = this.Dispatch<AccountSummaryMessage>(requestId).GetAwaiter();
 
 			Framework.Log("== Requesting Account Info ==");
 			_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
@@ -37,15 +32,6 @@ namespace IBDownloader.managers
 			}
 
 			return job.GetResult();
-		}
-
-		private void _ibClient_AccountSummary(AccountSummaryMessage message)
-		{
-			if (this.CheckRequestStillPending(message.RequestId))
-			{
-				var data = this.GetPendingRequestData<ConcurrentDictionary<string, AccountSummaryMessage>>(message.RequestId);
-				data[message.Tag] = message;
-			}
 		}
     }
 }

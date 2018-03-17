@@ -7,8 +7,8 @@ using System.Text;
 
 namespace IBDownloader
 {
-    class ErrorMessage 
-    {
+    class ErrorMessage : Managers.IBMultiMessageData
+	{
         private string message;
         private int errorCode;
         private int requestId;

@@ -5,9 +5,9 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class PnLSingleMessage
-    {
-        public int ReqId { get; private set; }
+    class PnLSingleMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public int Pos { get; private set; }
         public double DailyPnL { get; private set; }
         public double Value { get; private set; }
@@ -16,7 +16,7 @@ namespace IBDownloader.messages
 
         public PnLSingleMessage(int reqId, int pos, double dailyPnL, double unrealizedPnL, double realizedPnL, double value)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Pos = pos;
             DailyPnL = dailyPnL;
             Value = value;

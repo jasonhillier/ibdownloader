@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using IBApi;
-using IBDownloader.managers;
+using IBDownloader.Managers;
 using IBDownloader;
 using IBDownloader.messages;
 

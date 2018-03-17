@@ -5,13 +5,13 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalTickEndMessage
-    {
-        public int ReqId { get; private set; }
+    class HistoricalTickEndMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
 
         public HistoricalTickEndMessage(int reqId)
         {
-            ReqId = reqId;
+            RequestId = reqId;
         }
     }
 }

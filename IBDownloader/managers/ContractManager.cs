@@ -8,31 +8,27 @@ using System.Threading.Tasks;
 using IBDownloader.messages;
 using IBApi;
 
-namespace IBDownloader.managers
+namespace IBDownloader.Managers
 {
 	class ContractManager : BaseManager
 	{
 		public ContractManager(IBClient ibClient)
 			: base(ibClient)
 		{
-			_ibClient.ContractDetails += _ibClient_ContractDetails;
-			_ibClient.ContractDetailsEnd += _ibClient_ContractDetailsEnd;
+			_ibClient.ContractDetails += this.AppendPendingRequestData;
+			_ibClient.ContractDetailsEnd += this.HandleEndMessage;
 		}
 
-		private void _ibClient_ContractDetailsEnd(int RequestId)
+		public async Task<List<Contract>> GetContract(string secType, string symbol, string currency, string exchange)
 		{
-			this.MarkCompleted(RequestId);
+			Contract[] contracts = await _ibClient.ResolveContractAsync(secType, symbol, currency, exchange);
+			return new List<Contract>(contracts);
 		}
 
-		private void _ibClient_ContractDetails(ContractDetailsMessage obj)
-		{
-			this.SetPendingRequestData<ContractDetails>(obj.RequestId, obj.ContractDetails);
-		}
-
-		public async Task<ContractDetails> GetContractDetails(Contract Contract)
+		public async Task<List<ContractDetails>> GetContractDetails(Contract Contract)
 		{
 			int requestId = this.GetNextTaskId();
-			var job = this.Dispatch<ContractDetails>(requestId).GetAwaiter();
+			var job = this.Dispatch<ContractDetailsMessage>(requestId).GetAwaiter();
 
 			Framework.Log("Requesting Contract Details...");
 			_ibClient.ClientSocket.reqContractDetails(requestId, Contract);
@@ -42,7 +38,12 @@ namespace IBDownloader.managers
 				await Task.Delay(100);
 			}
 
-			return job.GetResult();
+			var messages = job.GetResult();
+
+			return messages.ConvertAll<ContractDetails>((i) =>
+			{
+				return i.ContractDetails;
+			});
 		}
 	}
 }

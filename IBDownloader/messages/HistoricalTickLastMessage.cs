@@ -5,9 +5,9 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalTickLastMessage
-    {
-        public int ReqId { get; private set; }
+    class HistoricalTickLastMessage : Managers.IBMultiMessageData
+	{
+        public int RequestId { get; private set; }
         public long Time { get; private set; }
         public int Mask { get; private set; }
         public double Price { get; private set; }
@@ -17,7 +17,7 @@ namespace IBDownloader.messages
 
         public HistoricalTickLastMessage(int reqId, long time, int mask, double price, long size, string exchange, string specialConditions)
         {
-            ReqId = reqId;
+            RequestId = reqId;
             Time = time;
             Mask = mask;
             Price = price;

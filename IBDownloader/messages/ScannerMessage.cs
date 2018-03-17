@@ -8,8 +8,8 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class ScannerMessage
-    {
+    class ScannerMessage : Managers.IBMultiMessageData
+	{
         private int requestId;
         private int rank;
         private ContractDetails contractDetails;

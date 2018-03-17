@@ -5,13 +5,21 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class SecurityDefinitionOptionParameterEndMessage
-    {
+    class SecurityDefinitionOptionParameterEndMessage : Managers.IBMultiMessageData
+	{
         private int reqId;
 
         public SecurityDefinitionOptionParameterEndMessage(int reqId)
         {
             this.reqId = reqId;
         }
+
+		public int RequestId
+		{
+			get
+			{
+				return reqId;
+			}
+		}
     }
 }
