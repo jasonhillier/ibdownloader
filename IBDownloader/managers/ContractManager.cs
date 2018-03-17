@@ -19,7 +19,7 @@ namespace IBDownloader.Managers
 			_ibClient.ContractDetailsEnd += this.HandleEndMessage;
 		}
 
-		public async Task<List<Contract>> GetContract(string secType, string symbol, string currency, string exchange)
+		public async Task<List<Contract>> GetContracts(string secType, string symbol, string currency, string exchange)
 		{
 			Contract[] contracts = await _ibClient.ResolveContractAsync(secType, symbol, currency, exchange);
 			return new List<Contract>(contracts);
@@ -27,18 +27,12 @@ namespace IBDownloader.Managers
 
 		public async Task<List<ContractDetails>> GetContractDetails(Contract Contract)
 		{
-			int requestId = this.GetNextTaskId();
-			var job = this.Dispatch<ContractDetailsMessage>(requestId).GetAwaiter();
-
-			Framework.Log("Requesting Contract Details...");
-			_ibClient.ClientSocket.reqContractDetails(requestId, Contract);
-
-			while (!job.IsCompleted)
+			var messages = await this.Dispatch<ContractDetailsMessage>((requestId) =>
 			{
-				await Task.Delay(100);
-			}
-
-			var messages = job.GetResult();
+				Framework.Log("Requesting Contract Details...");
+				_ibClient.ClientSocket.reqContractDetails(requestId, Contract);
+				return true;
+			});
 
 			return messages.ConvertAll<ContractDetails>((i) =>
 			{

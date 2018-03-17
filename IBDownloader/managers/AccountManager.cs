@@ -20,18 +20,12 @@ namespace IBDownloader.Managers
 
 		public async Task<List<AccountSummaryMessage>> GetAccountSummary()
 		{
-			int requestId = this.GetNextTaskId();
-			var job = this.Dispatch<AccountSummaryMessage>(requestId).GetAwaiter();
-
-			Framework.Log("== Requesting Account Info ==");
-			_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
-
-			while (!job.IsCompleted)
+			return await this.Dispatch<AccountSummaryMessage>((requestId) =>
 			{
-				await Task.Delay(100);
-			}
-
-			return job.GetResult();
+				Framework.Log("== Requesting Account Info ==");
+				_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
+				return true;
+			});
 		}
     }
 }

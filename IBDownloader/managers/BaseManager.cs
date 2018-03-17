@@ -96,6 +96,25 @@ namespace IBDownloader.Managers
 			_pendingRequestStatus[EndMessage.RequestId] = true;
 		}
 
+		protected async Task<List<T>> Dispatch<T>(Func<int, bool> initiator) where T : IBMultiMessageData
+		{
+			int requestId = this.GetNextTaskId();
+			var job = this.Dispatch<T>(requestId).GetAwaiter();
+
+			if (!initiator(requestId))
+			{
+				//initiator aborted request
+				this.HandleEndMessage(requestId);
+			}
+
+			while (!job.IsCompleted)
+			{
+				await Task.Delay(100);
+			}
+
+			return job.GetResult();
+		}
+
 		protected async Task<List<T>> Dispatch<T>(int taskId) where T : IBMultiMessageData
 		{
 			_pendingRequestResults[taskId] = new ConcurrentBag<IBMultiMessageData>();
