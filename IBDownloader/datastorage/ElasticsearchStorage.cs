@@ -9,11 +9,24 @@ namespace IBDownloader.DataStorage
 {
     class ElasticsearchStorage : BaseDataStorage
     {
-		public ElasticsearchStorage(IDataProcessor DataProcessor)
+		//requires a data processor to ensure unique row ids
+		public ElasticsearchStorage(IDataProcessor DataProcessor, string Server = null, string Index = null)
 			: base(DataProcessor)
 		{
+			this.Server = Framework.Settings.Get("ELASTICSEARCH_URL", Server);
+			this.Index = Framework.Settings.Get("ELASTICSEARCH_INDEX", Index);
 
+			if (String.IsNullOrEmpty(this.Server))
+				throw new Exception("No elasticsearch server defined!");
+			if (String.IsNullOrEmpty(this.Index))
+				throw new Exception("No elasticsearch index defined!");
+
+			this.Log("Elasticsearch URI: {0}", this.Server);
+			this.Log("Elasticsearch Index: {0}", this.Index);
 		}
+
+		public string Server { get; private set; }
+		public string Index { get; set; }
 
 		/// <summary>
 		/// Serialize computed option data into a data package (string).

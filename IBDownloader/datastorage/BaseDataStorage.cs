@@ -7,22 +7,21 @@ using System.Threading.Tasks;
 
 namespace IBDownloader.DataStorage
 {
-    abstract class BaseDataStorage
+    abstract class BaseDataStorage : IFrameworkLoggable
     {
 		protected IDataProcessor _dataProcessor;
 		protected ConcurrentQueue<IDataRow> _dataQueue = new ConcurrentQueue<IDataRow>();
 
-		public BaseDataStorage(IDataProcessor DataProcessor)
+		public BaseDataStorage(IDataProcessor DataProcessor = null)
 		{
 			_dataProcessor = DataProcessor;
 		}
 
-		public virtual async void ProcessTaskResultAsync(TaskResultData ResultData)
+		public virtual void ProcessTaskResult(TaskResultData ResultData)
 		{
-			if (_dataProcessor.CheckIfSupported(ResultData))
+			if (_dataProcessor != null && _dataProcessor.CheckIfSupported(ResultData))
 			{
-				//TODO: use a periodic processing queue to bundle and submit data
-				await Task.Delay(1);
+				//TODO: create a periodic processing queue to bundle and submit data
 
 				IDataRow row = _dataProcessor.Convert(ResultData);
 

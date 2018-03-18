@@ -113,26 +113,26 @@ namespace IBDownloader
 							continue;
 						}
 
-						await System.Threading.Tasks.Task.Run(async () =>
+						TaskResultData resultData = null;
+						try
 						{
-							TaskResultData resultData;
-							try
-							{
-								resultData = await task.ExecuteAsync(instruction);
-							}
-							catch (Exception ex)
-							{
-								Framework.LogError("Error in task for instruction {0}", instruction.taskType);
-								Framework.LogError(ex.Message);
-								Framework.LogError(ex.StackTrace);
-								return;
-							}
+							resultData = await task.ExecuteAsync(instruction);
+						}
+						catch (Exception ex)
+						{
+							Framework.LogError("Error in task for instruction {0}", instruction.taskType);
+							Framework.LogError(ex.Message);
+							Framework.LogError(ex.StackTrace);
+							return;
+						}
 
+						if (resultData != null)
+						{
 							Framework.Log("Completed task for instruction {0}", instruction.taskType);
 
 							if (this.OnTaskResult != null)
 								this.OnTaskResult(resultData);
-						});
+						}
 					}
 				}
 			}

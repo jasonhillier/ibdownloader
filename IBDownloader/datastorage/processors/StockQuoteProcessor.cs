@@ -16,7 +16,7 @@ namespace IBDownloader.DataStorage.Processors
 
 		public IDataRow Convert(TaskResultData taskResult)
 		{
-			return null;
+			throw new NotImplementedException();
 		}
 	}
 }

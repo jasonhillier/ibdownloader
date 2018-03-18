@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace IBDownloader.Managers
 {
@@ -73,7 +74,7 @@ namespace IBDownloader.Managers
 			TimeSpan? Duration = null, HistoricalDataType DataType = HistoricalDataType.TRADES, bool UseRTH = false
 			)
 		{
-			return await this.Dispatch<HistoricalDataMessage>((requestId) =>
+			var dataBars = await this.Dispatch<HistoricalDataMessage>((requestId) =>
 			{
 				this.Log("Requesting Historical Data...");
 				_ibClient.ClientSocket.reqHistoricalData(
@@ -90,6 +91,15 @@ namespace IBDownloader.Managers
 					);
 				return true;
 			});
+
+			dataBars.All((bar) =>
+			{
+				//convert the datetime from IB format into normalized ISO time format
+				bar.Date = Framework.ParseDateTz(bar.Date, DateTime.Now).Value.ToISOString();
+				return true;
+			});
+
+			return dataBars.OrderBy(bar => bar.Date).ToList();
 		}
 	}
 }

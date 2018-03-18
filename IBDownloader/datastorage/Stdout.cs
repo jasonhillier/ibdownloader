@@ -15,7 +15,7 @@ namespace IBDownloader.DataStorage
 
 		}
 
-		public override void ProcessTaskResultAsync(TaskResultData ResultData)
+		public override void ProcessTaskResult(TaskResultData ResultData)
 		{
 			Framework.DebugPrint(ResultData.Data);
 		}

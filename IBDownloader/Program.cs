@@ -15,8 +15,8 @@ namespace IBDownloader
 			var taskHandler = new IBDTaskHandler(controller);
 			taskHandler.Begin();
 
-			var stdout = new DataStorage.Stdout(new DataStorage.Processors.StockQuoteProcessor());
-			taskHandler.OnTaskResult += stdout.ProcessTaskResultAsync;
+			var stdout = new DataStorage.JSONFile();
+			taskHandler.OnTaskResult += stdout.ProcessTaskResult;
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
 			Console.WriteLine("Waiting for tasks...");

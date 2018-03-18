@@ -27,7 +27,12 @@ namespace IBDownloader
 			DateTime date;
 			bool success = false;
 
-			if (DateValue.Length == 8)
+			if (DateValue.Length == 18)
+			{
+				//20180316  14:30:00
+				success = DateTime.TryParseExact(DateValue, "yyyyMMdd  HH:mm:ss", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out date);
+			}
+			else if (DateValue.Length == 8)
 			{
 				success = DateTime.TryParseExact(DateValue, "yyyyMMdd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out date);
 			}

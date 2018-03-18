@@ -8,14 +8,26 @@ namespace IBDownloader
 {
 	static class Extensions
 	{
+		public static string ToISOString(this DateTime value)
+		{
+			return value.ToUniversalTime().ToString("o");
+		}
+
 		public static T ParseElse<T>(this string value, T defaultValue)
 		{
 			//TODO: deal with potential upcast
+
 
 			if (defaultValue is DateTime)
 			{
 				DateTime result;
 				if (DateTime.TryParse(value, out result))
+					return (T)(object)result;
+			}
+			else if (defaultValue is TimeSpan)
+			{
+				TimeSpan result;
+				if (TimeSpan.TryParse(value, out result))
 					return (T)(object)result;
 			}
 			else if (defaultValue is Enum)
