@@ -32,8 +32,8 @@ namespace IBDownloader.Managers
 
 	class HistoricalDataManager : BaseManager
 	{
-		public HistoricalDataManager(IBClient ibClient)
-			: base(ibClient)
+		public HistoricalDataManager(IBController Controller, IBClient ibClient)
+			: base(Controller, ibClient)
 		{
 			_ibClient.HistoricalData += this.AppendPendingRequestData;
 			_ibClient.HistoricalDataEnd += this.HandleEndMessage;

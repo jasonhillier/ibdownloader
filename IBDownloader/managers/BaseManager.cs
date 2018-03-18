@@ -15,14 +15,16 @@ namespace IBDownloader.Managers
 	}
 	abstract class BaseManager
 	{
-		const int WAIT_TIMEOUT = 15; //no responses for x seconds
+		const int WAIT_TIMEOUT = 30; //no responses for x seconds
 		protected IBClient _ibClient;
+		protected IBController _Controller;
 		private static int _requestIdCounter = 1;
 		private ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>> _pendingRequestResults = new ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>>();
 		private ConcurrentDictionary<int, DateTime> _pendingRequestStatus = new ConcurrentDictionary<int, DateTime>();
 
-		public BaseManager(IBClient ibClient)
+		public BaseManager(IBController Controller, IBClient ibClient)
 		{
+			_Controller = Controller;
 			_ibClient = ibClient;
 			_ibClient.Error += _ibClient_Error;
 		}

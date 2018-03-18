@@ -21,10 +21,10 @@ namespace IBDownloader
 			_ibClient.NextValidId += HandleMessage;
 
 			this.IsConnected = false;
-			this.AccountManager = new AccountManager(_ibClient);
-			this.ContractManager = new ContractManager(_ibClient);
-			this.HistoricalDataManager = new HistoricalDataManager(_ibClient);
-			this.OptionManager = new OptionManager(_ibClient);
+			this.AccountManager = new AccountManager(this, _ibClient);
+			this.ContractManager = new ContractManager(this, _ibClient);
+			this.HistoricalDataManager = new HistoricalDataManager(this, _ibClient);
+			this.OptionManager = new OptionManager(this, _ibClient);
 		}
 
 		public bool IsConnected { get; private set; }

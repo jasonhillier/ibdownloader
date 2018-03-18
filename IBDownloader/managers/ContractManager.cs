@@ -28,8 +28,8 @@ namespace IBDownloader.Managers
 	}
 	class ContractManager : BaseManager
 	{
-		public ContractManager(IBClient ibClient)
-			: base(ibClient)
+		public ContractManager(IBController Controller, IBClient ibClient)
+			: base(Controller, ibClient)
 		{
 			_ibClient.ContractDetails += this.AppendPendingRequestData;
 			_ibClient.ContractDetailsEnd += this.HandleEndMessage;

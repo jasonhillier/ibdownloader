@@ -11,8 +11,8 @@ namespace IBDownloader.Managers
 {
     class AccountManager : BaseManager
 	{
-		public AccountManager(IBClient ibClient)
-			: base(ibClient)
+		public AccountManager(IBController Controller, IBClient ibClient)
+			: base(Controller, ibClient)
 		{
 			_ibClient.AccountSummary += this.AppendPendingRequestData;
 			_ibClient.AccountSummaryEnd += this.HandleEndMessage;
@@ -20,12 +20,18 @@ namespace IBDownloader.Managers
 
 		public async Task<List<AccountSummaryMessage>> GetAccountSummary()
 		{
-			return await this.Dispatch<AccountSummaryMessage>((requestId) =>
+			var accountSummary = await this.Dispatch<AccountSummaryMessage>((requestId) =>
 			{
 				Framework.Log("== Requesting Account Info ==");
 				_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
 				return true;
 			});
+
+			//we don't want a subscription
+			if (accountSummary.Count > 0)
+				_ibClient.ClientSocket.cancelAccountSummary(accountSummary[0].RequestId);
+
+			return accountSummary;
 		}
     }
 }
