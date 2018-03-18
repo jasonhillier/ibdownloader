@@ -18,7 +18,7 @@ namespace IBDownloader.Tasks
 		public object Data { get; set; }
 	}
 
-    abstract class BaseTask
+    abstract class BaseTask : IFrameworkLoggable
     {
 		protected IBDTaskHandler _TaskHandler;
 		protected IBController _Controller;

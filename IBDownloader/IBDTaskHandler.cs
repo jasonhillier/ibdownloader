@@ -16,6 +16,8 @@ namespace IBDownloader
 		public IBDTaskInstruction(string TaskType)
 		{
 			this.taskType = TaskType;
+			this.contract = new Contract();
+			this.parameters = new Dictionary<string, string>();
 		}
 
 		/// <summary>
@@ -31,18 +33,10 @@ namespace IBDownloader
 
 		public string Symbol
 		{
-			get
-			{
-				if (contract == null)
-					return null;
-				return contract.Symbol;
-			}
-			set
-			{
-				this.contract = new Contract();
-				this.contract.Symbol = value;
-			}
+			get	{ return contract.Symbol; }
+			set	{ this.contract.Symbol = value; }
 		}
+
 		public Dictionary<string, string> parameters { get; set; }
 		public Contract contract { get; set; }
 		public string taskType { get; set; }

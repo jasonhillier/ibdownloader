@@ -19,8 +19,12 @@ namespace IBDownloader.Tasks
 			DateTime endTime = instruction.GetParameter("EndTime").ParseElse(DateTime.Now);
 			Managers.BarSize barSize = instruction.GetParameter("BarSize").ParseElse(Managers.BarSize.M15);
 
-			var data = await _Controller.HistoricalDataManager.GetHistoricalData(instruction.contract, endTime, barSize);
-			Framework.Log("Downloaded {0} bars.", data.Count);
+			DateTime earliestDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(instruction.contract);
+
+			this.Log("Earliest date is {0}", earliestDate);
+
+			var data = await _Controller.HistoricalDataManager.GetHistoricalData(instruction.contract, endTime, barSize, null, Managers.HistoricalDataType.BID_ASK);
+			this.Log("Downloaded {0} bars.", data.Count);
 
 			return new TaskResultData(instruction, data.Count > 0, data);
 		}

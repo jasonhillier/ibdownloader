@@ -24,24 +24,14 @@ namespace IBDownloader.Managers
 
 		public void AddOption(Contract Option)
 		{
+			DateTime? expirationDateParsed = Framework.ParseDateTz(Option.LastTradeDateOrContractMonth);
 			//check if valid option contract
-			if (Option.Strike <= 0 ||
-				String.IsNullOrEmpty(Option.LastTradeDateOrContractMonth))
+			if (expirationDateParsed == null || Option.Strike <= 0)
 			{
 				return; //ignore it
 			}
 
-			DateTime expirationDate;
-			if (Option.LastTradeDateOrContractMonth.Length>6)
-			{
-				if (!DateTime.TryParseExact(Option.LastTradeDateOrContractMonth, "yyyyMMdd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out expirationDate))
-					return;
-			}
-			else
-			{
-				if (!DateTime.TryParseExact(Option.LastTradeDateOrContractMonth, "yyyyMM", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out expirationDate))
-					return;
-			}
+			DateTime expirationDate = (DateTime)expirationDateParsed;
 
 			if (!Expirations.ContainsKey(expirationDate))
 				this.Expirations.Add(expirationDate, new Expiration(expirationDate));

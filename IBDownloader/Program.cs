@@ -15,12 +15,16 @@ namespace IBDownloader
 			var taskHandler = new IBDTaskHandler(controller);
 			taskHandler.Begin();
 
-			var elasticsearch = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.StockQuoteProcessor());
-			taskHandler.OnTaskResult += elasticsearch.ProcessTaskResultAsync;
+			var stdout = new DataStorage.Stdout(new DataStorage.Processors.StockQuoteProcessor());
+			taskHandler.OnTaskResult += stdout.ProcessTaskResultAsync;
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
 			Console.WriteLine("Waiting for tasks...");
-			taskHandler.AddTask(new IBDTaskInstruction("ListOptionContracts"){ Symbol = "SPY" });
+			//taskHandler.AddTask(new IBDTaskInstruction("ListOptionContracts"){ Symbol = "SPY" });
+			taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData")
+			{
+				contract = {ConId= 308142771, Exchange = "SMART"}
+			});
 
 			Console.ReadLine();
         }

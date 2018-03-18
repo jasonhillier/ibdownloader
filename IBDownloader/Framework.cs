@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace IBDownloader
@@ -14,6 +16,34 @@ namespace IBDownloader
 		}
 
 		public static SettingsData Settings { get; private set; }
+
+		#region Date Handlers
+
+		/// <summary>
+		/// Parse a date-time string (with an ambigous tz) according to a predefined tz
+		/// </summary>
+		public static DateTime? ParseDateTz(string DateValue, DateTime? defaultValue = null)
+		{
+			DateTime date;
+			bool success = false;
+
+			if (DateValue.Length == 8)
+			{
+				success = DateTime.TryParseExact(DateValue, "yyyyMMdd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out date);
+			}
+			else if (DateValue.Length == 6)
+			{
+				success = DateTime.TryParseExact(DateValue, "yyyyMM", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out date);
+			}
+			else
+			{
+				success = DateTime.TryParse(DateValue, out date);
+			}
+
+			return (success ? date : defaultValue);
+		}
+
+		#endregion
 
 		#region Logging
 
@@ -62,11 +92,32 @@ namespace IBDownloader
 		{
 			if (@object == null)
 				return;
-			foreach (var property in @object.GetType().GetProperties())
+
+			if (@object is IEnumerable)
 			{
-				var value = property.GetValue(@object, null);
-				if (value != null)
-					Console.WriteLine(property.Name + ": " + value.ToString());
+				foreach(var item in (IEnumerable)@object)
+				{
+					DebugPrint(item);
+				}
+
+				return;
+			}
+
+			var properties = @object.GetType().GetProperties();
+			if (properties.Length == 0)
+			{
+				//for scalars
+				Console.WriteLine(@object.ToString());
+			}
+			else
+			{
+				//for objects
+				foreach (var property in properties)
+				{
+					var value = property.GetValue(@object, null);
+					if (value != null)
+						Console.WriteLine(property.Name + ": " + value.ToString());
+				}
 			}
 		}
 

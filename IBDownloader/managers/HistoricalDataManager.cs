@@ -37,6 +37,32 @@ namespace IBDownloader.Managers
 		{
 			_ibClient.HistoricalData += this.AppendPendingRequestData;
 			_ibClient.HistoricalDataEnd += this.HandleEndMessage;
+
+			_ibClient.HeadTimestamp += this.AppendPendingRequestData;
+			_ibClient.HeadTimestamp += this.HandleEndMessage;
+		}
+
+		public async Task<DateTime> GetEarliestDataTime(Contract Contract, bool UseRTH = false)
+		{
+			var messages = await this.Dispatch<HeadTimestampMessage>((requestId) =>
+			{
+				_ibClient.ClientSocket.reqHeadTimestamp(
+					requestId,
+					Contract,
+					"BID_ASK",
+					UseRTH ? 1 : 0,
+					1);
+				return true;
+			});
+
+			if (messages.Count == 1)
+			{
+				return (DateTime)Framework.ParseDateTz(messages[0].HeadTimestamp, DateTime.Now);
+			}
+			else
+			{
+				return DateTime.Now;
+			}
 		}
 
 		/// <summary>
