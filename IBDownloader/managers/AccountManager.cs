@@ -22,7 +22,7 @@ namespace IBDownloader.Managers
 		{
 			var accountSummary = await this.Dispatch<AccountSummaryMessage>((requestId) =>
 			{
-				Framework.Log("== Requesting Account Info ==");
+				this.Log("Requesting Account Summary...");
 				_ibClient.ClientSocket.reqAccountSummary(requestId, "All", AccountSummaryTags.GetAllTags());
 				return true;
 			});

@@ -8,6 +8,50 @@ namespace IBDownloader
 {
 	static class Extensions
 	{
+		public static T ParseElse<T>(this string value, T defaultValue)
+		{
+			//TODO: deal with potential upcast
+
+			if (defaultValue is DateTime)
+			{
+				DateTime result;
+				if (DateTime.TryParse(value, out result))
+					return (T)(object)result;
+			}
+			else if (defaultValue is Enum)
+			{
+				object result;
+				if (Enum.TryParse(typeof(T), value, out result))
+					return (T)result;
+			}
+			else if (defaultValue is int)
+			{
+				int result;
+				if (int.TryParse(value, out result))
+					return (T)(object)result;
+			}
+			else if (defaultValue is double)
+			{
+				double result;
+				if (double.TryParse(value, out result))
+					return (T)(object)result;
+			}
+			else if (defaultValue is float)
+			{
+				float result;
+				if (float.TryParse(value, out result))
+					return (T)(object)result;
+			}
+			else if (defaultValue is decimal)
+			{
+				decimal result;
+				if (decimal.TryParse(value, out result))
+					return (T)(object)result;
+			}
+
+			return defaultValue;
+		}
+
 		public static string ToDescription(this Enum en) //ext method
 		{
 			Type type = en.GetType();

@@ -85,13 +85,15 @@ namespace IBDownloader.Managers
 			{
 				Symbol = Contract.Symbol,
 				SecType = "OPT",
-				Currency = Contract.Currency,
-				Exchange = Contract.Exchange
+				Currency = Contract.Currency != null ? Contract.Currency : "USD",
+				Exchange = Contract.Exchange != null ? Contract.Exchange : "SMART"
 			};
 
-			Framework.Log("Loading option contract chain for {0}...", contractSearch.Symbol);
+			this.Log("Loading option contract chain for {0}...", contractSearch.Symbol);
 
 			var foundContracts = await _Controller.ContractManager.GetContractDetails(contractSearch);
+
+			this.Log("Found {0} option contracts", foundContracts.Count);
 
 			OptionChain chain = new OptionChain(Contract);
 			foundContracts.All((optionContract) =>

@@ -18,9 +18,9 @@ namespace IBDownloader
 			var elasticsearch = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.StockQuoteProcessor());
 			taskHandler.OnTaskResult += elasticsearch.ProcessTaskResultAsync;
 
-			taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
+			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
 			Console.WriteLine("Waiting for tasks...");
-			taskHandler.AddTask(new IBDTaskInstruction("thing 2"));
+			taskHandler.AddTask(new IBDTaskInstruction("ListOptionContracts"){ Symbol = "SPY" });
 
 			Console.ReadLine();
         }

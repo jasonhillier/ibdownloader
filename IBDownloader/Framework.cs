@@ -4,6 +4,8 @@ using System.Text;
 
 namespace IBDownloader
 {
+	interface IFrameworkLoggable {}
+
     static class Framework
     {
 		static Framework()
@@ -15,14 +17,30 @@ namespace IBDownloader
 
 		#region Logging
 
+		//extension
+		public static void LogError(this IFrameworkLoggable caller, string format, params object[] args)
+		{
+			Log("[" + caller.GetType().Name + "] ERROR " + format, args);
+		}
 		public static void LogError(string format, params object[] args)
 		{
 			Log("ERROR " + format, args);
 		}
 
+		//extension
+		public static void LogWarn(this IFrameworkLoggable caller, string format, params object[] args)
+		{
+			Log("[" + caller.GetType().Name + "] WARN " + format, args);
+		}
 		public static void LogWarn(string format, params object[] args)
 		{
 			Log("WARN " + format, args);
+		}
+
+		//extension
+		public static void Log(this IFrameworkLoggable caller, string format, params object[] args)
+		{
+			Log("[" + caller.GetType().Name + "] " + format, args);
 		}
 
 		public static void Log(string format, params object[] args)
@@ -63,7 +81,7 @@ namespace IBDownloader
 		{
 			get
 			{
-				return Environment.GetEnvironmentVariable(key);
+				return Environment.GetEnvironmentVariable(key.ToUpper());
 			}
 		}
 

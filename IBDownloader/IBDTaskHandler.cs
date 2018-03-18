@@ -5,18 +5,48 @@ using System.Text;
 using System.Linq;
 using IBDownloader.Tasks;
 using System.Reflection;
+using IBApi;
 
 namespace IBDownloader
 {
-
+	[Serializable]
 	class IBDTaskInstruction
 	{
+		public IBDTaskInstruction() { }
 		public IBDTaskInstruction(string TaskType)
 		{
-			this.TaskType = TaskType;
+			this.taskType = TaskType;
 		}
 
-		public string TaskType { get; set; }
+		/// <summary>
+		/// Gets a paramter value, or from settings if not found
+		/// </summary>
+		public string GetParameter(string Key)
+		{
+			if (parameters != null && parameters.ContainsKey(Key))
+				return parameters[Key];
+			else
+				return Framework.Settings[Key];
+		}
+
+		public string Symbol
+		{
+			get
+			{
+				if (contract == null)
+					return null;
+				return contract.Symbol;
+			}
+			set
+			{
+				this.contract = new Contract();
+				this.contract.Symbol = value;
+			}
+		}
+		public Dictionary<string, string> parameters { get; set; }
+		public Contract contract { get; set; }
+		public string taskType { get; set; }
+		public dynamic datum { get; set; }
 	}
 
     class IBDTaskHandler
@@ -81,11 +111,11 @@ namespace IBDownloader
 						BaseTask task;
 						try
 						{
-							task = CreateTask(instruction.TaskType);
+							task = CreateTask(instruction.taskType);
 						}
 						catch
 						{
-							Framework.LogError("No task of type {0} is defined!", instruction.TaskType);
+							Framework.LogError("No task of type {0} is defined!", instruction.taskType);
 							continue;
 						}
 
@@ -98,13 +128,13 @@ namespace IBDownloader
 							}
 							catch (Exception ex)
 							{
-								Framework.LogError("Error in task for instruction {0}", instruction.TaskType);
+								Framework.LogError("Error in task for instruction {0}", instruction.taskType);
 								Framework.LogError(ex.Message);
 								Framework.LogError(ex.StackTrace);
 								return;
 							}
 
-							Framework.Log("Completed task for instruction {0}", instruction.TaskType);
+							Framework.Log("Completed task for instruction {0}", instruction.taskType);
 
 							if (this.OnTaskResult != null)
 								this.OnTaskResult(resultData);

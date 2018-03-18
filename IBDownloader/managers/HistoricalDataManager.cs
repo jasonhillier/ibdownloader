@@ -49,7 +49,7 @@ namespace IBDownloader.Managers
 		{
 			return await this.Dispatch<HistoricalDataMessage>((requestId) =>
 			{
-				Framework.Log("Requesting Historical Data...");
+				this.Log("Requesting Historical Data...");
 				_ibClient.ClientSocket.reqHistoricalData(
 					requestId,
 					Contract,

@@ -35,6 +35,9 @@ namespace IBDownloader.Managers
 			_ibClient.ContractDetailsEnd += this.HandleEndMessage;
 		}
 
+		/// <summary>
+		/// Get contract definitions by criteria
+		/// </summary>
 		public async Task<List<Contract>> GetContracts(SecurityType secType, string symbol, string currency = "USD", string exchange = "SMART")
 		{
 			var contractSearch = new Contract()
@@ -52,16 +55,19 @@ namespace IBDownloader.Managers
 			});
 		}
 
+		/// <summary>
+		/// Get detailed info about a contract
+		/// </summary>
 		public async Task<List<ContractDetails>> GetContractDetails(Contract Contract)
 		{
 			var messages = await this.Dispatch<ContractDetailsMessage>((requestId) =>
 			{
-				Framework.Log("Requesting Contract Details...");
+				this.Log("Requesting Contract Details...");
 				_ibClient.ClientSocket.reqContractDetails(requestId, Contract);
 				return true;
 			});
 
-			return messages.ConvertAll<ContractDetails>((i) =>
+			return messages.ConvertAll((i) =>
 			{
 				return i.ContractDetails;
 			});

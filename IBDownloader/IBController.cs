@@ -9,7 +9,7 @@ using IBDownloader.messages;
 
 namespace IBDownloader
 {
-	class IBController
+	class IBController : IFrameworkLoggable
 	{
 		protected IBClient _ibClient;
 		private EReaderMonitorSignal _signal = new EReaderMonitorSignal();
@@ -37,7 +37,7 @@ namespace IBDownloader
 		{
 			try
 			{
-				Framework.Log("Connecting to IB gateway on localhost:4001...");
+				Framework.Log(this, "Connecting to IB gateway on localhost:4001...");
 
 				_ibClient.ClientId = 11;
 				_ibClient.ClientSocket.eConnect("localhost", 4001, _ibClient.ClientId);
@@ -59,7 +59,7 @@ namespace IBDownloader
 		private void HandleMessage(ConnectionStatusMessage m)
 		{
 			this.IsConnected = m.IsConnected;
-			Framework.Log("Connected to IBGateway:" + m.IsConnected);
+			Framework.Log(this, "Connected to IBGateway:" + m.IsConnected);
 		}
 
 		private void _ibClient_ConnectionClosed()

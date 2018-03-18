@@ -13,7 +13,7 @@ namespace IBDownloader.Managers
 	{
 		int RequestId { get; }
 	}
-	abstract class BaseManager
+	abstract class BaseManager : IFrameworkLoggable
 	{
 		const int WAIT_TIMEOUT = 30; //no responses for x seconds
 		protected IBClient _ibClient;
@@ -81,7 +81,7 @@ namespace IBDownloader.Managers
 				if (ExpectedMessageType == null)
 					ExpectedMessageType = typeof(System.DBNull);
 
-				Framework.LogWarn("Request {0} for {1} was already completed!", requestId, ExpectedMessageType.Name);
+				this.LogWarn("Request {0} for {1} was already completed!", requestId, ExpectedMessageType.Name);
 			}
 
 			return isPending;
@@ -154,13 +154,15 @@ namespace IBDownloader.Managers
 				if ((DateTime.Now - _pendingRequestStatus[requestId]).TotalSeconds > WAIT_TIMEOUT &&
 					_pendingRequestStatus[requestId] != DateTime.MinValue)
 				{
-					Framework.LogError("Request {0} of {1} timed out.", requestId, typeof(T).Name);
+					this.LogError("Request {1} of {2} timed out.", requestId, typeof(T).Name);
 				}
 			}
 
 			_pendingRequestStatus.Remove(requestId, out _);
 			ConcurrentBag<IBMultiMessageData> data = null;
 			_pendingRequestResults.Remove(requestId, out data);
+
+			this.Log("Received {0} messages", data.Count);
 			
 			return data.ToList().ConvertAll((i)=>
 			{
