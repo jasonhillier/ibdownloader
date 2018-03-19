@@ -26,7 +26,7 @@ namespace IBDownloader.Tasks
 			earliestDate = earliestDate.StartOfDay();
 			TimeSpan duration = DateTime.Now - earliestDate;
 
-			this.Log("Earliest date is {0}", earliestDate);
+			this.Log("Earliest date for {0} is {1}", instruction.ConId, earliestDate);
 
 			List<HistoricalDataMessage> bars = new List<HistoricalDataMessage>();
 			if (duration.TotalDays > 0)
