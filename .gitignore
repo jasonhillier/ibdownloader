@@ -2,3 +2,4 @@ bin/
 obj/
 .vs/
 launchSettings.json
+docker-compose.yml
