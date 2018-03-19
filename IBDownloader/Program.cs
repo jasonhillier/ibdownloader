@@ -55,7 +55,10 @@ namespace IBDownloader
 				}
 			}
 
-			return new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+			var storage = new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
+
+			return storage;
 		}
 
 		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler, string pSymbol, string FilePathName)
