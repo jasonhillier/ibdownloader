@@ -23,8 +23,11 @@ namespace IBDownloader
 				case "runtaskfile":
 					storage = RunTaskFile(taskHandler, args[1]);
 					break;
+				case "optiontasks":
+					storage = BuildOptionDownloadTasks(taskHandler, args[1]);
+					break;
 				default:
-					storage = BuildOptionDownloadTasks(taskHandler);
+					throw new Exception("No commands specified! Try runtaskfile or optiontasks");
 					break;
 			}
 
@@ -55,9 +58,9 @@ namespace IBDownloader
 			return new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
 		}
 
-		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler)
+		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler, string FilePathName)
 		{
-			var storage = new DataStorage.JSONFile("optiontasks.json");
+			var storage = new DataStorage.JSONFile(FilePathName);
 			//var storage = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
