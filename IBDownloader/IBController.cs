@@ -37,10 +37,14 @@ namespace IBDownloader
 		{
 			try
 			{
-				Framework.Log(this, "Connecting to IB gateway on localhost:4001...");
+				string host = Framework.Settings.Get("IB_HOST", "localhost");
+				int port = Framework.Settings.Get("IB_PORT", 4001);
+				int clientId = Framework.Settings.Get("IB_CLIENTID", 11);
 
-				_ibClient.ClientId = 11;
-				_ibClient.ClientSocket.eConnect("localhost", 4001, _ibClient.ClientId);
+				this.Log("Connecting to IB gateway on {0}:{1}... (client_id={2})", host, port, clientId);
+
+				_ibClient.ClientId = clientId;
+				_ibClient.ClientSocket.eConnect(host, port, _ibClient.ClientId);
 
 				var reader = new EReader(_ibClient.ClientSocket, _signal);
 

@@ -6,6 +6,7 @@ using System.Linq;
 using IBDownloader.Tasks;
 using System.Reflection;
 using IBApi;
+using System.Threading;
 
 namespace IBDownloader
 {
@@ -18,6 +19,7 @@ namespace IBDownloader
 			this.taskType = TaskType;
 			this.contract = new Contract();
 			this.parameters = new Dictionary<string, string>();
+			this.metadata = new Dictionary<string, object>();
 		}
 
 		/// <summary>
@@ -37,15 +39,17 @@ namespace IBDownloader
 			set	{ this.contract.Symbol = value; }
 		}
 
+		public Dictionary<string, object> metadata { get; set; }
 		public Dictionary<string, string> parameters { get; set; }
 		public Contract contract { get; set; }
 		public string taskType { get; set; }
 		public dynamic datum { get; set; }
 	}
 
-    class IBDTaskHandler
+    class IBDTaskHandler : IFrameworkLoggable
     {
 		private ConcurrentQueue<IBDTaskInstruction> _TaskQueue = new ConcurrentQueue<IBDTaskInstruction>();
+		private bool _pendingTasks = false;
 		private bool _AbortFlag;
 
 		public IBDTaskHandler(IBController Controller)
@@ -66,12 +70,21 @@ namespace IBDownloader
 		}
 
 		/// <summary>
-		/// Begin handling tasks in background
+		/// Begin handling tasks in background, stop when all tasks have finished processing.
 		/// </summary>
 		public async System.Threading.Tasks.Task BeginAsync()
 		{
 			_AbortFlag = false;
-			await _RunTasks();
+			_RunTasks().ConfigureAwait(false);
+
+			//wait around until there is nothing left to do
+			while(_TaskQueue.Count > 0 || _pendingTasks)
+			{
+				await System.Threading.Tasks.Task.Delay(1000);
+			}
+
+			//then stop it
+			this.Stop();
 		}
 
 		/// <summary>
@@ -93,12 +106,23 @@ namespace IBDownloader
 		//Run tasks as they come
 		private async System.Threading.Tasks.Task _RunTasks()
 		{
+			this.Log("Waiting for tasks...");
+
 			while (!_AbortFlag)
 			{
 				await System.Threading.Tasks.Task.Delay(100);
 
-				if (_TaskQueue.Count > 0 && this.Controller.IsConnected)
+				if (!this.Controller.IsConnected)
+					continue;
+
+				if (_TaskQueue.Count == 0)
 				{
+					_pendingTasks = false;
+				}
+				else
+				{
+					_pendingTasks = true;
+
 					IBDTaskInstruction instruction;
 					if (_TaskQueue.TryDequeue(out instruction))
 					{
@@ -109,7 +133,7 @@ namespace IBDownloader
 						}
 						catch
 						{
-							Framework.LogError("No task of type {0} is defined!", instruction.taskType);
+							this.LogError("No task of type {0} is defined!", instruction.taskType);
 							continue;
 						}
 
@@ -120,15 +144,15 @@ namespace IBDownloader
 						}
 						catch (Exception ex)
 						{
-							Framework.LogError("Error in task for instruction {0}", instruction.taskType);
-							Framework.LogError(ex.Message);
-							Framework.LogError(ex.StackTrace);
+							this.LogError("Error in task for instruction {0}", instruction.taskType);
+							this.LogError(ex.Message);
+							this.LogError(ex.StackTrace);
 							return;
 						}
 
 						if (resultData != null)
 						{
-							Framework.Log("Completed task for instruction {0}", instruction.taskType);
+							this.Log("Completed task for instruction {0}", instruction.taskType);
 
 							if (this.OnTaskResult != null)
 								this.OnTaskResult(resultData);

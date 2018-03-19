@@ -14,7 +14,7 @@ namespace IBDownloader.DataStorage
 	interface IDataProcessor
     {
 		bool CheckIfSupported(TaskResultData taskResult);
-		IDataRow Convert(TaskResultData taskResult);
+		IEnumerable<IDataRow> Convert(TaskResultData taskResult);
 		//IEnumerable<IDataRow> Convert(IEnumerable<TaskResultData> taskResults);
     }
 }

@@ -11,6 +11,7 @@ namespace IBDownloader.DataStorage
     {
 		protected IDataProcessor _dataProcessor;
 		protected ConcurrentQueue<IDataRow> _dataQueue = new ConcurrentQueue<IDataRow>();
+		protected bool _processingStarted = false;
 
 		public BaseDataStorage(IDataProcessor DataProcessor = null)
 		{
@@ -19,22 +20,95 @@ namespace IBDownloader.DataStorage
 
 		public virtual void ProcessTaskResult(TaskResultData ResultData)
 		{
-			if (_dataProcessor != null && _dataProcessor.CheckIfSupported(ResultData))
+			try
 			{
-				//TODO: create a periodic processing queue to bundle and submit data
+				if (_dataProcessor != null && _dataProcessor.CheckIfSupported(ResultData))
+				{
+					//TODO: create a periodic processing queue to bundle and submit data
 
-				IDataRow row = _dataProcessor.Convert(ResultData);
+					var rows = _dataProcessor.Convert(ResultData);
 
-				_dataQueue.Enqueue(row);
+					foreach (var row in rows)
+						_dataQueue.Enqueue(row);
+
+					if (!_processingStarted)
+						this.BeginProcessingAsync();
+				}
+			} catch (Exception ex)
+			{
+				this.LogError("Result processing error:");
+				this.LogError(ex.Message);
+				this.LogError(ex.StackTrace);
 			}
+		}
+
+		/// <summary>
+		/// Dequeue all available items waiting in queue
+		/// </summary>
+		protected virtual List<IDataRow> Dequeue()
+		{
+			IDataRow row;
+			List<IDataRow> rows = new List<IDataRow>();
+			while (_dataQueue.TryDequeue(out row))
+			{
+				rows.Add(row);
+			}
+
+			return rows;
+		}
+
+		protected virtual void BeginProcessingAsync()
+		{
+			_processingStarted = true;
+
+			Task.Run(async () =>
+			{
+				//give it a sec for buffering to start
+				await Task.Delay(1000);
+
+				if (_dataQueue.Count>0)
+				{
+					try
+					{
+						await ProcessQueue();
+					}
+					catch (Exception ex)
+					{
+						this.LogError("Queue processing error:");
+						this.LogError(ex.Message);
+						this.LogError(ex.StackTrace);
+					}
+				}
+
+				_processingStarted = false;
+			});
+		}
+
+		protected virtual async Task ProcessQueue()
+		{
+			await Task.Delay(1);
+			//not implemented
 		}
 
 		/// <summary>
 		/// give data storage time to finish commit
 		/// </summary>
-		public virtual async void FlushAsync()
+		public virtual async Task FlushAsync(bool waitForData = false)
 		{
-			await Task.Delay(1);
+			//TODO: timeout?
+			if (waitForData)
+			{
+				while(!_processingStarted)
+				{
+					await Task.Delay(1000);
+				}
+			}
+
+			//wait for all data to get processed
+			while (_dataQueue.Count > 0 || _processingStarted)
+			{
+				await Task.Delay(1000);
+			}
 		}
 	}
 }

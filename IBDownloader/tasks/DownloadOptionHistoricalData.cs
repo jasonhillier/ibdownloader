@@ -20,6 +20,9 @@ namespace IBDownloader.Tasks
 			TimeSpan duration = instruction.GetParameter("Duration").ParseElse(TimeSpan.FromDays(1));
 			Managers.BarSize barSize = instruction.GetParameter("BarSize").ParseElse(Managers.BarSize.M15);
 
+			if (! await this.LookupDerivative(instruction))
+				return TaskResultData.Failure(instruction, "Matching contract info for derivative not found!");
+
 			DateTime earliestDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(instruction.contract);
 
 			this.Log("Earliest date is {0}", earliestDate);

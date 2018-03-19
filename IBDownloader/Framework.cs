@@ -27,6 +27,9 @@ namespace IBDownloader
 			DateTime date;
 			bool success = false;
 
+			if (string.IsNullOrEmpty(DateValue))
+				return defaultValue;
+
 			if (DateValue.Length == 18)
 			{
 				//20180316  14:30:00

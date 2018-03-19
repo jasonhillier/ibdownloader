@@ -13,20 +13,24 @@ namespace IBDownloader
 			controller.Connect();
 
 			var taskHandler = new IBDTaskHandler(controller);
-			taskHandler.Begin();
 
-			var stdout = new DataStorage.JSONFile();
-			taskHandler.OnTaskResult += stdout.ProcessTaskResult;
+			var storage = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+			taskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
-			Console.WriteLine("Waiting for tasks...");
 			//taskHandler.AddTask(new IBDTaskInstruction("ListOptionContracts"){ Symbol = "SPY" });
 			taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData")
 			{
 				contract = {ConId= 308142771, Exchange = "SMART"}
 			});
 
+			taskHandler.BeginAsync().Wait();
+			storage.FlushAsync().Wait();
+
+			Console.WriteLine("Processing complete.");
+#if DEBUG
 			Console.ReadLine();
-        }
+#endif
+		}
 	}
 }

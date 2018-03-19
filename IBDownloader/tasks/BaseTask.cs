@@ -16,6 +16,16 @@ namespace IBDownloader.Tasks
 		public IBDTaskInstruction Instruction {get; set;}
 		public bool HasData { get; set; }
 		public object Data { get; set; }
+
+		public static TaskResultData Failure(IBDTaskInstruction Instruction, string Message = null)
+		{
+			if (!string.IsNullOrEmpty(Message))
+			{
+				Framework.LogError("Task failed: " + Message);
+			}
+
+			return new TaskResultData(Instruction, false);
+		}
 	}
 
     abstract class BaseTask : IFrameworkLoggable
@@ -30,5 +40,24 @@ namespace IBDownloader.Tasks
 		}
 
 		public abstract System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction Instruction);
+
+		public async System.Threading.Tasks.Task<bool> LookupDerivative(IBDTaskInstruction Instruction)
+		{
+			var selectedContracts = await _Controller.ContractManager.GetContractDetails(Instruction.contract);
+			if (selectedContracts.Count < 1)
+				return false;
+			//reset to full derivative contract definition
+			Instruction.contract = selectedContracts[0].Summary;
+			string underlyingSymbol = selectedContracts[0].UnderSymbol;
+			int underlyingConId = selectedContracts[0].UnderConId;
+			//lookup underlying
+			var underlying = await _Controller.ContractManager.GetContract(underlyingConId, underlyingSymbol);
+			if (underlying == null)
+				return false;
+
+			Instruction.metadata["underlying"] = underlying;
+
+			return true;
+		}
 	}
 }
