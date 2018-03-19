@@ -1,5 +1,7 @@
 FROM microsoft/dotnet:2.1-sdk
 
+RUN apt-get update && apt-get install -y net-tools telnet tmux nano
+
 ADD . /ibdownloader
 WORKDIR ibdownloader
 RUN dotnet build -c release
