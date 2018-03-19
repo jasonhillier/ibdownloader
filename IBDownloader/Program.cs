@@ -24,7 +24,7 @@ namespace IBDownloader
 					storage = RunTaskFile(taskHandler, args[1]);
 					break;
 				case "optiontasks":
-					storage = BuildOptionDownloadTasks(taskHandler, args[1]);
+					storage = BuildOptionDownloadTasks(taskHandler, args[1], args[2]);
 					break;
 				default:
 					throw new Exception("No commands specified! Try runtaskfile or optiontasks");
@@ -58,14 +58,14 @@ namespace IBDownloader
 			return new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
 		}
 
-		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler, string FilePathName)
+		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler, string pSymbol, string FilePathName)
 		{
 			var storage = new DataStorage.JSONFile(FilePathName);
 			//var storage = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
-			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = "SPY" });
+			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = pSymbol });
 			//taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData") { ConId = 308142771 });
 
 			return storage;
