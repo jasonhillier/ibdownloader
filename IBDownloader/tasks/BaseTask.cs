@@ -48,10 +48,9 @@ namespace IBDownloader.Tasks
 				return false;
 			//reset to full derivative contract definition
 			Instruction.contract = selectedContracts[0].Summary;
-			string underlyingSymbol = selectedContracts[0].UnderSymbol;
 			int underlyingConId = selectedContracts[0].UnderConId;
 			//lookup underlying
-			var underlying = await _Controller.ContractManager.GetContract(underlyingConId, underlyingSymbol);
+			var underlying = await _Controller.ContractManager.GetContract(underlyingConId);
 			if (underlying == null)
 				return false;
 

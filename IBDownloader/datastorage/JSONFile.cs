@@ -10,19 +10,23 @@ namespace IBDownloader.DataStorage
 {
 	class JSONFile : BaseDataStorage
 	{
-		public JSONFile(IDataProcessor DataProcessor = null)
-			: base(DataProcessor)
+		public JSONFile(string FilePathName = "file.json")
+			: base()
 		{
-
+			this.FilePathName = FilePathName;
 		}
+
+		public string FilePathName { get; set; }
 
 		public override void ProcessTaskResult(TaskResultData ResultData)
 		{
 			string fileName = ResultData.Instruction.GetParameter("file");
-			if (String.IsNullOrEmpty(fileName)) fileName = "file.json";
+			if (String.IsNullOrEmpty(fileName)) fileName = FilePathName;
 
 			string jsonData = JsonConvert.SerializeObject(ResultData.Data);
 			File.WriteAllBytes(fileName, Encoding.UTF8.GetBytes(jsonData));
+
+			this.Log("Wrote JSON to file " + fileName);
 		}
 	}
 }

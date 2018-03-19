@@ -32,7 +32,7 @@ namespace IBDownloader.DataStorage
 						_dataQueue.Enqueue(row);
 
 					if (!_processingStarted)
-						this.BeginProcessingAsync();
+						this.BeginProcessing();
 				}
 			} catch (Exception ex)
 			{
@@ -57,7 +57,7 @@ namespace IBDownloader.DataStorage
 			return rows;
 		}
 
-		protected virtual void BeginProcessingAsync()
+		protected virtual void BeginProcessing()
 		{
 			_processingStarted = true;
 
@@ -95,6 +95,9 @@ namespace IBDownloader.DataStorage
 		/// </summary>
 		public virtual async Task FlushAsync(bool waitForData = false)
 		{
+			if (_dataProcessor == null)
+				return;
+
 			//TODO: timeout?
 			if (waitForData)
 			{

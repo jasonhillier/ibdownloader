@@ -13,13 +13,17 @@ namespace IBDownloader
 	[Serializable]
 	class IBDTaskInstruction
 	{
-		public IBDTaskInstruction() { }
-		public IBDTaskInstruction(string TaskType)
+		public IBDTaskInstruction()
 		{
-			this.taskType = TaskType;
 			this.contract = new Contract();
 			this.parameters = new Dictionary<string, string>();
 			this.metadata = new Dictionary<string, object>();
+		}
+
+		public IBDTaskInstruction(string TaskType)
+			: this()
+		{
+			this.taskType = TaskType;
 		}
 
 		/// <summary>
@@ -37,6 +41,11 @@ namespace IBDownloader
 		{
 			get	{ return contract.Symbol; }
 			set	{ this.contract.Symbol = value; }
+		}
+		public int ConId
+		{
+			get { return contract.ConId; }
+			set { this.contract.ConId = value; }
 		}
 
 		public Dictionary<string, object> metadata { get; set; }
@@ -154,8 +163,18 @@ namespace IBDownloader
 						{
 							this.Log("Completed task for instruction {0}", instruction.taskType);
 
-							if (this.OnTaskResult != null)
-								this.OnTaskResult(resultData);
+							try
+							{
+								if (this.OnTaskResult != null)
+									this.OnTaskResult(resultData);
+							}
+							catch (Exception ex)
+							{
+								this.LogError("Error in processing task result for instruction {0}", instruction.taskType);
+								this.LogError(ex.Message);
+								this.LogError(ex.StackTrace);
+								return;
+							}
 						}
 					}
 				}

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Threading;
+﻿using IBDownloader.DataStorage;
+using System;
+using System.IO;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace IBDownloader
 {
     class Program
     {
-		
-
 		static void Main(string[] args)
         {
 			var controller = new IBController();
@@ -14,23 +15,57 @@ namespace IBDownloader
 
 			var taskHandler = new IBDTaskHandler(controller);
 
-			var storage = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
-			taskHandler.OnTaskResult += storage.ProcessTaskResult;
+			BaseDataStorage storage;
 
-			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
-			//taskHandler.AddTask(new IBDTaskInstruction("ListOptionContracts"){ Symbol = "SPY" });
-			taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData")
+			string commandArg = (args.Length > 0) ? args[0] : "default";
+			switch(commandArg)
 			{
-				contract = {ConId= 308142771, Exchange = "SMART"}
-			});
+				case "runtaskfile":
+					storage = RunTaskFile(taskHandler, args[1]);
+					break;
+				default:
+					storage = BuildOptionDownloadTasks(taskHandler);
+					break;
+			}
 
 			taskHandler.BeginAsync().Wait();
 			storage.FlushAsync().Wait();
 
-			Console.WriteLine("Processing complete.");
+			Framework.Log("Processing complete.");
 #if DEBUG
 			Console.ReadLine();
 #endif
+		}
+
+		static BaseDataStorage RunTaskFile(IBDTaskHandler TaskHandler, string FilePathName)
+		{
+			using (StreamReader file = new StreamReader(File.Open(FilePathName, FileMode.Open)))
+			{
+				string taskListJson = file.ReadToEnd();
+
+				var tasks = JsonConvert.DeserializeObject<List<IBDTaskInstruction>>(taskListJson);
+				Framework.Log("Preparing {0} tasks...", tasks.Count);
+
+				foreach (var task in tasks)
+				{
+					TaskHandler.AddTask(task);
+				}
+			}
+
+			return new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+		}
+
+		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler)
+		{
+			var storage = new DataStorage.JSONFile("optiontasks.json");
+			//var storage = new DataStorage.ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
+
+			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
+			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = "SPY" });
+			//taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData") { ConId = 308142771 });
+
+			return storage;
 		}
 	}
 }

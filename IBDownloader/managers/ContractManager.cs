@@ -38,12 +38,12 @@ namespace IBDownloader.Managers
 		/// <summary>
 		/// Get contract definitions by criteria
 		/// </summary>
-		public async Task<Contract> GetContract(int ConId, string symbol)
+		public async Task<Contract> GetContract(int ConId, string exchange = "SMART")
 		{
 			var contractSearch = new Contract()
 			{
 				ConId = ConId,
-				Symbol = symbol
+				Exchange = exchange
 			};
 
 			var contractDetails = await GetContractDetails(contractSearch);

@@ -76,7 +76,7 @@ namespace IBDownloader.Managers
 		{
 			var dataBars = await this.Dispatch<HistoricalDataMessage>((requestId) =>
 			{
-				this.Log("Requesting Historical Data...");
+				this.Log("Requesting Historical Data for {0} ending on {1}...", Contract.LocalSymbol, EndTime);
 				_ibClient.ClientSocket.reqHistoricalData(
 					requestId,
 					Contract,

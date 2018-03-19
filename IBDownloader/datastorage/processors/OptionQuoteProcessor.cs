@@ -66,12 +66,13 @@ namespace IBDownloader.DataStorage.Processors
 			{
 				get
 				{
-					return this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ");
+					return this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
 				}
 			}
 
 			public string symbol { get { return _Contract.LocalSymbol; } }
 			public string type { get { return _Contract.SecType; } } //TODO: need to have normalized type names
+			public int contractId {  get { return _Contract.ConId; } }
 
 			public DateTime date
 			{
