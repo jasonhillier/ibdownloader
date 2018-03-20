@@ -57,6 +57,7 @@ namespace IBDownloader
 
     class IBDTaskHandler : IFrameworkLoggable
     {
+		private int _TotalTaskCounter = 0; //count how many total tasks have been run
 		private ConcurrentQueue<IBDTaskInstruction> _TaskQueue = new ConcurrentQueue<IBDTaskInstruction>();
 		private bool _pendingTasks = false;
 		private bool _AbortFlag;
@@ -135,6 +136,9 @@ namespace IBDownloader
 					IBDTaskInstruction instruction;
 					if (_TaskQueue.TryDequeue(out instruction))
 					{
+						_TotalTaskCounter++;
+						this.Log("Running task {0} with {1} remaining.", _TotalTaskCounter, _TaskQueue.Count);
+
 						BaseTask task;
 						try
 						{
@@ -162,8 +166,6 @@ namespace IBDownloader
 						if (resultData != null)
 						{
 							this.Log("Completed task for instruction {0}", instruction.taskType);
-							if (_TaskQueue.Count > 0)
-								this.Log("{0} tasks remaining", _TaskQueue.Count);
 
 							try
 							{

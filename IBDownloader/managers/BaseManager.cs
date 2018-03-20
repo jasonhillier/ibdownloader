@@ -15,7 +15,7 @@ namespace IBDownloader.Managers
 	}
 	abstract class BaseManager : IFrameworkLoggable
 	{
-		const int WAIT_TIMEOUT = 30; //no responses for x seconds
+		const int WAIT_TIMEOUT = 120; //no responses for x seconds
 		protected IBClient _ibClient;
 		protected IBController _Controller;
 		private static int _requestIdCounter = 1;
@@ -154,7 +154,8 @@ namespace IBDownloader.Managers
 				if ((DateTime.Now - _pendingRequestStatus[requestId]).TotalSeconds > WAIT_TIMEOUT &&
 					_pendingRequestStatus[requestId] != DateTime.MinValue)
 				{
-					this.LogError("Request {1} of {2} timed out.", requestId, typeof(T).Name);
+					this.LogError("Request {1} of {2} timed out.", requestId, typeof(T).GetType().Name);
+					_pendingRequestStatus[requestId] = DateTime.MinValue; //let it end
 				}
 			}
 
