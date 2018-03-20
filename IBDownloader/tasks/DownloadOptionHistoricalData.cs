@@ -24,7 +24,7 @@ namespace IBDownloader.Tasks
 
 			DateTime earliestDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(instruction.contract);
 			earliestDate = earliestDate.StartOfDay();
-			TimeSpan duration = DateTime.Now - earliestDate;
+			TimeSpan duration = DateTime.Now.EndOfDay().AddDays(1) - earliestDate;
 
 			this.Log("Earliest date for {0} is {1}", instruction.ConId, earliestDate);
 
@@ -35,11 +35,17 @@ namespace IBDownloader.Tasks
 
 				for(var i=1; i<=days; i++)
 				{
+					//we can safely download up to 7 days at a time
+					int pageSize = 1;
+					if (days - i > 3) pageSize = 3;
+					if (days - i > 7) pageSize = 7;
+					i += pageSize - 1;
+
 					var data = await _Controller.HistoricalDataManager.GetHistoricalData(
 						instruction.contract,
 						earliestDate.AddDays(i), 
-						barSize, 
-						TimeSpan.FromDays(1), 
+						barSize,
+						pageSize,
 						Managers.HistoricalDataType.BID_ASK);
 					this.Log("Downloaded {0} bars.", data.Count);
 

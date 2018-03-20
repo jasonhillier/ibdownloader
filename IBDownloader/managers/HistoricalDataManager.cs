@@ -71,7 +71,7 @@ namespace IBDownloader.Managers
 		/// </summary>
 		public async Task<List<HistoricalDataMessage>> GetHistoricalData(
 			Contract Contract, DateTime EndTime, BarSize BarSize,
-			TimeSpan? Duration = null, HistoricalDataType DataType = HistoricalDataType.TRADES, bool UseRTH = false
+			int DurationDays = 1, HistoricalDataType DataType = HistoricalDataType.TRADES, bool UseRTH = false
 			)
 		{
 			var dataBars = await this.Dispatch<HistoricalDataMessage>((requestId) =>
@@ -81,7 +81,7 @@ namespace IBDownloader.Managers
 					requestId,
 					Contract,
 					EndTime.ToString("yyyyMMdd HH:mm:ss"),
-					"1 D", //Duration
+					DurationDays + " D", //Duration
 					BarSize.ToDescription(),
 					DataType.ToString(),
 					UseRTH ? 1 : 0,

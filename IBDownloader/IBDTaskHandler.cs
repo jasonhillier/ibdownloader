@@ -162,6 +162,8 @@ namespace IBDownloader
 						if (resultData != null)
 						{
 							this.Log("Completed task for instruction {0}", instruction.taskType);
+							if (_TaskQueue.Count > 0)
+								this.Log("{0} tasks remaining", _TaskQueue.Count);
 
 							try
 							{
