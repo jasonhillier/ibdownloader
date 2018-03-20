@@ -15,7 +15,7 @@ namespace IBDownloader
 	{
 		public IBDTaskInstruction()
 		{
-			this.contract = new Contract();
+			this.contract = new Contract() { Exchange = "SMART", Currency = "USD" };
 			this.parameters = new Dictionary<string, string>();
 			this.metadata = new Dictionary<string, object>();
 		}
@@ -41,6 +41,11 @@ namespace IBDownloader
 		{
 			get	{ return contract.Symbol; }
 			set	{ this.contract.Symbol = value; }
+		}
+		public string SecType
+		{
+			get { return contract.SecType; }
+			set { contract.SecType = value; }
 		}
 		public int ConId
 		{

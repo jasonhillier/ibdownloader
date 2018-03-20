@@ -68,7 +68,7 @@ namespace IBDownloader
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
-			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = pSymbol });
+			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = pSymbol, SecType = "STK" });
 			//taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData") { ConId = 308142771 });
 
 			return storage;

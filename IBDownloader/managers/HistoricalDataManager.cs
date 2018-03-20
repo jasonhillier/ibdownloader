@@ -28,7 +28,11 @@ namespace IBDownloader.Managers
 		[DescriptionAttribute("4 hours")]
 		H4,
 		[DescriptionAttribute("1 day")]
-		D1
+		Day,
+		[DescriptionAttribute("1 week")]
+		Week,
+		[DescriptionAttribute("1 month")]
+		Month
 	};
 
 	class HistoricalDataManager : BaseManager
@@ -67,11 +71,40 @@ namespace IBDownloader.Managers
 		}
 
 		/// <summary>
+		/// Get high, low price for a security
+		/// </summary>
+		public async Task<Tuple<double, double>> GetPriceRange(Contract contract, int DurationMonths=1)
+		{
+			var bars = await GetHistoricalData(contract, DateTime.Now.EndOfDay(), BarSize.Month, DurationMonths + " M");
+
+			double high = 0;
+			double low = 0;
+			bars.All((bar) =>
+			{
+				if (bar.High > high)
+					high = bar.High;
+				if (bar.Low < low || low==0)
+					low = bar.Low;
+				return true;
+			});
+
+			return Tuple.Create<double, double>(high, low);
+		}
+
+		/// <summary>
 		/// Get historical time-series data from IB
 		/// </summary>
 		public async Task<List<HistoricalDataMessage>> GetHistoricalData(
 			Contract Contract, DateTime EndTime, BarSize BarSize,
 			int DurationDays = 1, HistoricalDataType DataType = HistoricalDataType.TRADES, bool UseRTH = false
+			)
+		{
+			return await GetHistoricalData(Contract, EndTime, BarSize, DurationDays + " D", DataType, UseRTH);
+		}
+
+		private async Task<List<HistoricalDataMessage>> GetHistoricalData(
+			Contract Contract, DateTime EndTime, BarSize BarSize,
+			string Duration = "1 D", HistoricalDataType DataType = HistoricalDataType.TRADES, bool UseRTH = false
 			)
 		{
 			var dataBars = await this.Dispatch<HistoricalDataMessage>((requestId) =>
@@ -81,7 +114,7 @@ namespace IBDownloader.Managers
 					requestId,
 					Contract,
 					EndTime.ToString("yyyyMMdd HH:mm:ss"),
-					DurationDays + " D", //Duration
+					Duration,
 					BarSize.ToDescription(),
 					DataType.ToString(),
 					UseRTH ? 1 : 0,
