@@ -35,10 +35,9 @@ namespace IBDownloader.Tasks
 
 				for(var i=1; i<=days; i++)
 				{
-					//we can safely download up to 7 days at a time
-					int pageSize = 1;
-					if (days - i > 3) pageSize = 3;
-					if (days - i > 7) pageSize = 7;
+					//we can safely download up to 30 days at a time
+					int pageSize = (days - i) + 1;
+					if (pageSize > 30) pageSize = 30;
 					i += pageSize - 1;
 
 					var data = await _Controller.HistoricalDataManager.GetHistoricalData(
