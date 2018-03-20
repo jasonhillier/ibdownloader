@@ -16,11 +16,11 @@ namespace IBDownloader.Managers
 		public OptionChain(Contract Underlying)
 		{
 			this.Underlying = Underlying;
-			this.Expirations = new Dictionary<DateTime, Expiration>();
+			this.Expirations = new SortedDictionary<DateTime, Expiration>();
 		}
 
 		public Contract Underlying { get; private set; }
-		public Dictionary<DateTime, Expiration> Expirations { get; private set; }
+		public SortedDictionary<DateTime, Expiration> Expirations { get; private set; }
 
 		public void AddOption(Contract Option)
 		{
@@ -44,13 +44,23 @@ namespace IBDownloader.Managers
 
 		public class Expiration
 		{
+			public enum Type { weekly, monthly, unknown };
 			public Expiration(DateTime ExpirationDate)
 			{
 				Date = ExpirationDate;
 				Puts = new SortedList<double, Contract>();
 				Calls = new SortedList<double, Contract>();
+
+				//TODO: make this smarter
+				if (ExpirationDate.DayOfWeek == DayOfWeek.Friday)
+					ExpType = Type.monthly;
+				else if (ExpirationDate.DayOfWeek == DayOfWeek.Monday)
+					ExpType = Type.weekly;
+				else
+					ExpType = Type.unknown;
 			}
 
+			public Type ExpType { get; set; }
 			public DateTime Date { get; private set; }
 			public SortedList<double, Contract> Puts { get; private set; }
 			public SortedList<double, Contract> Calls { get; private set; }

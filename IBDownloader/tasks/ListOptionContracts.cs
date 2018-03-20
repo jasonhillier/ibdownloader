@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using IBApi;
+using IBDownloader.Managers;
 
 namespace IBDownloader.Tasks
 {
@@ -16,10 +17,10 @@ namespace IBDownloader.Tasks
 
 		public override async System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction instruction)
 		{
-			double limitStrikeHigh = 0;
-			double limitStrikeLow = 0;
+			double limitStrikeHigh = double.MaxValue;
+			double limitStrikeLow = double.MinValue;
 
-			//if (instruction.GetParameter("filter.range").ParseElse<double>(0) > 0)
+			if (instruction.GetParameter("filter.range").ParseElse<double>(0) > 0)
 			{
 				//get the high-low during the past 6mos so we can filter down the option chain
 				var highLow = await _Controller.HistoricalDataManager.GetPriceRange(instruction.contract, 6);
@@ -29,11 +30,31 @@ namespace IBDownloader.Tasks
 				this.Log("Filtering to strikes between {0} and {1}", limitStrikeLow, limitStrikeHigh);
 			}
 
+			OptionChain.Expiration.Type expType = instruction.GetParameter("filter.expirytype").ParseElse(OptionChain.Expiration.Type.monthly);
+			if (expType != OptionChain.Expiration.Type.unknown)
+				this.Log("Filtering to {0}s", expType);
+
+			int limitExpiries = instruction.GetParameter("filter.expiries").ParseElse(3);
+			if (limitExpiries > 0)
+				this.Log("Filtering to {0} expiries ahead", limitExpiries);
+
 			var optionChain = await _Controller.OptionManager.GetOptionChain(instruction.contract);
 
+			int expiryCounter = 0;
 			List<int> flatContractIdList = new List<int>();
 			optionChain.Expirations.All((expiration) =>
 			{
+				if (limitExpiries > 0 && expiryCounter > limitExpiries)
+					return true;
+
+				if (expType != OptionChain.Expiration.Type.unknown &&
+					expiration.Value.ExpType != expType)
+				{
+					return true;
+				}
+
+				expiryCounter++;
+
 				expiration.Value.Puts.All((contract) =>
 				{
 					if (contract.Value.Strike >= limitStrikeLow &&

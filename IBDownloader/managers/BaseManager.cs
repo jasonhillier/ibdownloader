@@ -15,7 +15,7 @@ namespace IBDownloader.Managers
 	}
 	abstract class BaseManager : IFrameworkLoggable
 	{
-		const int WAIT_TIMEOUT = 120; //no responses for x seconds
+		const int WAIT_TIMEOUT = 240; //if no responses for x seconds
 		protected IBClient _ibClient;
 		protected IBController _Controller;
 		private static int _requestIdCounter = 1;
