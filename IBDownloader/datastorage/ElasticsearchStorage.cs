@@ -10,7 +10,7 @@ using Elasticsearch.Net;
 
 namespace IBDownloader.DataStorage
 {
-    class ElasticsearchStorage : BaseDataStorage
+    public class ElasticsearchStorage : BaseDataStorage
     {
 		private Nest.ElasticClient _client;
 		//requires a data processor to ensure unique row ids
@@ -27,13 +27,14 @@ namespace IBDownloader.DataStorage
 			if (String.IsNullOrEmpty(this.Index))
 				throw new Exception("No elasticsearch index defined!");
 
+			/*
 			_client = new Nest.ElasticClient(new ConnectionSettings(
 				new Uri(this.Server))
 				.DefaultIndex(this.Index)
 				.BasicAuthentication(this.Username, this.Password)
 				.EnableHttpCompression()
 				);
-
+			*/
 			this.Log("Elasticsearch URI: {0}", this.Server);
 			this.Log("Elasticsearch Index: {0}", this.Index);
 		}

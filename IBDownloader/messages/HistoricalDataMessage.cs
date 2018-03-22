@@ -7,7 +7,7 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class HistoricalDataMessage : Managers.IBMultiMessageData
+    public class HistoricalDataMessage : Managers.IBMultiMessageData
 	{
         protected int requestId;
         protected string date;

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace IBDownloader.DataStorage
 {
-	class Stdout : BaseDataStorage
+	public class Stdout : BaseDataStorage
 	{
 		public Stdout(IDataProcessor DataProcessor)
 			: base(DataProcessor)

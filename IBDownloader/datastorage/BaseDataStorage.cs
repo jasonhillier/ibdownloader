@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IBDownloader.DataStorage
 {
-    abstract class BaseDataStorage : IFrameworkLoggable
+    public abstract class BaseDataStorage : IFrameworkLoggable
     {
 		protected IDataProcessor _dataProcessor;
 		protected ConcurrentQueue<IDataRow> _dataQueue = new ConcurrentQueue<IDataRow>();

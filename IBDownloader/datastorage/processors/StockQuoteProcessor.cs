@@ -7,7 +7,7 @@ using IBDownloader.Tasks;
 
 namespace IBDownloader.DataStorage.Processors
 {
-    class StockQuoteProcessor : IDataProcessor
+    public class StockQuoteProcessor : IDataProcessor
     {
 		public bool CheckIfSupported(TaskResultData taskResult)
 		{

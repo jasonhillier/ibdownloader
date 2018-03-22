@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace IBDownloader.DataStorage.Processors
 {
-	class StockOptionQuoteConverter : OptionsQuoteProcessor, IDataPreProcessor
+	public class StockOptionQuoteConverter : OptionsQuoteProcessor, IDataPreProcessor
 	{
 		public override bool CheckIfSupported(TaskResultData taskResult)
 		{

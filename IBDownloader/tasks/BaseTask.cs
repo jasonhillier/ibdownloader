@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IBDownloader.Tasks
 {
-	class TaskResultData
+	public class TaskResultData
 	{
 		public TaskResultData(IBDTaskInstruction Instruction, bool HasData=false, object DataObject = null)
 		{

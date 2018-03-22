@@ -8,7 +8,7 @@ using System.IO;
 
 namespace IBDownloader.DataStorage
 {
-	class JSONFile : BaseDataStorage
+	public class JSONFile : BaseDataStorage
 	{
 		public JSONFile(string FilePathName = "file.json")
 			: base()

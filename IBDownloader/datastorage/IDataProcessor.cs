@@ -11,14 +11,14 @@ namespace IBDownloader.DataStorage
 		DateTime date { get; }
 	}
 
-	interface IDataProcessor
+	public interface IDataProcessor
     {
 		bool CheckIfSupported(TaskResultData taskResult);
 		IEnumerable<IDataRow> Convert(TaskResultData taskResult);
 		//IEnumerable<IDataRow> Convert(IEnumerable<TaskResultData> taskResults);
     }
 
-	interface IDataPreProcessor : IDataProcessor
+	public interface IDataPreProcessor : IDataProcessor
 	{
 		void PreConvert(BaseDataStorage storage, TaskResultData taskResult);
 	}

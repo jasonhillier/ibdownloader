@@ -11,7 +11,7 @@ using System.Threading;
 namespace IBDownloader
 {
 	[Serializable]
-	class IBDTaskInstruction
+	public class IBDTaskInstruction
 	{
 		public IBDTaskInstruction()
 		{

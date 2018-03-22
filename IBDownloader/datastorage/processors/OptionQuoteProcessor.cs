@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace IBDownloader.DataStorage.Processors
 {
-	class OptionsQuoteProcessor : IDataProcessor, IFrameworkLoggable
+	public class OptionsQuoteProcessor : IDataProcessor, IFrameworkLoggable
 	{
 		public virtual bool CheckIfSupported(TaskResultData taskResult)
 		{

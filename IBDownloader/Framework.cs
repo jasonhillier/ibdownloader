@@ -3,16 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace IBDownloader
 {
 	interface IFrameworkLoggable {}
 
-    static class Framework
+    internal static class Framework
     {
 		static Framework()
 		{
-			Framework.Settings = new SettingsData();
+			Framework.Settings = SettingsData.ParseConfig(Directory.GetCurrentDirectory() + "/settings.json");
 		}
 
 		public static SettingsData Settings { get; private set; }
@@ -134,13 +136,18 @@ namespace IBDownloader
 
 	class SettingsData
 	{
+		protected Dictionary<string, string> _SettingsData = new Dictionary<string, string>();
+
 		//TODO: command-line parser
 
 		public string this[string key]
 		{
 			get
 			{
-				return Environment.GetEnvironmentVariable(key.ToUpper());
+				if (_SettingsData.ContainsKey(key.ToUpper()))
+					return _SettingsData[key.ToUpper()];
+				else
+					return Environment.GetEnvironmentVariable(key.ToUpper());
 			}
 		}
 
@@ -162,6 +169,23 @@ namespace IBDownloader
 				return result;
 			else
 				return defaultValue;
+		}
+
+		public static SettingsData ParseConfig(string FilePathName)
+		{
+			var settingsData = new SettingsData();
+
+			if (File.Exists(FilePathName))
+			{
+				using (StreamReader jsonFile = new StreamReader(File.OpenRead(FilePathName)))
+				{
+					settingsData._SettingsData = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonFile.ReadToEnd());
+				}
+
+				Framework.Log("Loaded settings from " + FilePathName);
+			}
+
+			return settingsData;
 		}
 	}
 }

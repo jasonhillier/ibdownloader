@@ -1,0 +1,4 @@
+﻿{
+	"ELASTICSEARCH_URL": "localhost",
+	"ELASTICSEARCH_INDEX": "testindex"
+}

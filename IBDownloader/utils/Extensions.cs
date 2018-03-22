@@ -6,7 +6,7 @@ using System.Text;
 
 namespace IBDownloader
 {
-	static class Extensions
+	internal static class Extensions
 	{
 		public static string ToISOString(this DateTime value)
 		{
