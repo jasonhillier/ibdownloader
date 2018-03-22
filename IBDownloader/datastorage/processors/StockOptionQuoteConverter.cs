@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace IBDownloader.DataStorage.Processors
 {
-	class StockOptionQuoteProcessor : OptionsQuoteProcessor, IDataPreProcessor
+	class StockOptionQuoteConverter : OptionsQuoteProcessor, IDataPreProcessor
 	{
 		public override bool CheckIfSupported(TaskResultData taskResult)
 		{
@@ -35,7 +35,7 @@ namespace IBDownloader.DataStorage.Processors
 			//TODO: make generic interface
 			if (storage is ElasticsearchStorage)
 			{
-				taskResult.Metadata["OptionQuotes"] = ((ElasticsearchStorage)storage).FetchQuotes(DateTime.Now, DateTime.Now).Result;
+				taskResult.Metadata["OptionQuotes"] = ((ElasticsearchStorage)storage).FetchQuotes(taskResult.Instruction.Symbol, DateTime.Now, DateTime.Now).Result;
 			}
 		}
 

@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net;
+using Nest;
+using Elasticsearch.Net;
 
 namespace IBDownloader.DataStorage
 {
     class ElasticsearchStorage : BaseDataStorage
     {
+		private Nest.ElasticClient _client;
 		//requires a data processor to ensure unique row ids
 		public ElasticsearchStorage(IDataProcessor DataProcessor, string Server = null, string Index = null, string Username = null, string Password = null)
 			: base(DataProcessor)
@@ -23,6 +26,13 @@ namespace IBDownloader.DataStorage
 				throw new Exception("No elasticsearch server defined!");
 			if (String.IsNullOrEmpty(this.Index))
 				throw new Exception("No elasticsearch index defined!");
+
+			_client = new Nest.ElasticClient(new ConnectionSettings(
+				new Uri(this.Server))
+				.DefaultIndex(this.Index)
+				.BasicAuthentication(this.Username, this.Password)
+				.EnableHttpCompression()
+				);
 
 			this.Log("Elasticsearch URI: {0}", this.Server);
 			this.Log("Elasticsearch Index: {0}", this.Index);
@@ -103,7 +113,7 @@ namespace IBDownloader.DataStorage
 			return builder.ToString();
 		}
 
-		public async Task<List<IDataRow>> FetchQuotes(DateTime Start, DateTime End)
+		public async Task<List<IDataRow>> FetchQuotes(string Symbol, DateTime Start, DateTime End)
 		{
 			await Task.Delay(1);
 			return new List<IDataRow>();

@@ -23,6 +23,9 @@ namespace IBDownloader
 				case "runtaskfile":
 					storage = RunTaskFile(taskHandler, args[1]);
 					break;
+				case "optionwithstock":
+					storage = AddStockToOptions(taskHandler, args[1]);
+					break;
 				case "optiontasks":
 					storage = BuildOptionDownloadTasks(taskHandler, args[1], args[2]);
 					break;
@@ -51,6 +54,7 @@ namespace IBDownloader
 
 				foreach (var task in tasks)
 				{
+					//taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData") { ConId = 308142771 });
 					TaskHandler.AddTask(task);
 				}
 			}
@@ -69,7 +73,16 @@ namespace IBDownloader
 
 			//taskHandler.AddTask(new IBDTaskInstruction("TestTask"));
 			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = pSymbol, SecType = "STK" });
-			//taskHandler.AddTask(new IBDTaskInstruction("DownloadOptionHistoricalData") { ConId = 308142771 });
+
+			return storage;
+		}
+
+		static BaseDataStorage AddStockToOptions(IBDTaskHandler TaskHandler, string pSymbol)
+		{
+			TaskHandler.AddTask(new IBDTaskInstruction("DownloadHistoricalData") { Symbol = pSymbol, SecType = "STK" });
+
+			var storage = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteConverter());
+			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			return storage;
 		}
