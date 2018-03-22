@@ -17,4 +17,9 @@ namespace IBDownloader.DataStorage
 		IEnumerable<IDataRow> Convert(TaskResultData taskResult);
 		//IEnumerable<IDataRow> Convert(IEnumerable<TaskResultData> taskResults);
     }
+
+	interface IDataPreProcessor : IDataProcessor
+	{
+		void PreConvert(BaseDataStorage storage, TaskResultData taskResult);
+	}
 }

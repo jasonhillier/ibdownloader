@@ -102,5 +102,11 @@ namespace IBDownloader.DataStorage
 
 			return builder.ToString();
 		}
+
+		public async Task<List<IDataRow>> FetchQuotes(DateTime Start, DateTime End)
+		{
+			await Task.Delay(1);
+			return new List<IDataRow>();
+		}
 	}
 }

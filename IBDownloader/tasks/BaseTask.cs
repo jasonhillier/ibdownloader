@@ -11,11 +11,14 @@ namespace IBDownloader.Tasks
 			this.Instruction = Instruction;
 			this.HasData = HasData;
 			this.Data = DataObject;
+			this.Metadata = new Dictionary<string, object>();
 		}
 
 		public IBDTaskInstruction Instruction {get; set;}
 		public bool HasData { get; set; }
 		public object Data { get; set; }
+
+		public Dictionary<string, object> Metadata {get;set;}
 
 		public static TaskResultData Failure(IBDTaskInstruction Instruction, string Message = null)
 		{

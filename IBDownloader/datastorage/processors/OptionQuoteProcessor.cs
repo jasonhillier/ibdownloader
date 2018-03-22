@@ -10,7 +10,7 @@ namespace IBDownloader.DataStorage.Processors
 {
 	class OptionsQuoteProcessor : IDataProcessor, IFrameworkLoggable
 	{
-		public bool CheckIfSupported(TaskResultData taskResult)
+		public virtual bool CheckIfSupported(TaskResultData taskResult)
 		{
 			if (taskResult.Data is IEnumerable<HistoricalDataMessage>)
 			{
@@ -22,7 +22,7 @@ namespace IBDownloader.DataStorage.Processors
 			}
 		}
 
-		public IEnumerable<IDataRow> Convert(TaskResultData taskResult)
+		public virtual IEnumerable<IDataRow> Convert(TaskResultData taskResult)
 		{
 			if (!CheckIfSupported(taskResult))
 				return null;

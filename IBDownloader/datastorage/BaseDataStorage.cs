@@ -25,6 +25,7 @@ namespace IBDownloader.DataStorage
 				if (_dataProcessor != null && _dataProcessor.CheckIfSupported(ResultData))
 				{
 					//TODO: create a periodic processing queue to bundle and submit data
+					this.PreConvert(ResultData);
 
 					var rows = _dataProcessor.Convert(ResultData);
 
@@ -88,6 +89,14 @@ namespace IBDownloader.DataStorage
 		{
 			await Task.Delay(1);
 			//not implemented
+		}
+
+		protected virtual void PreConvert(TaskResultData ResultData)
+		{
+			if (_dataProcessor is IDataPreProcessor)
+			{
+				((IDataPreProcessor)_dataProcessor).PreConvert(this, ResultData);
+			}
 		}
 
 		/// <summary>
