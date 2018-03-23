@@ -90,11 +90,13 @@ namespace IBDownloader
 
 			try
 			{
+				System.Diagnostics.Debug.WriteLine(format, args);
 				Console.WriteLine(format, args);
 			}
 			catch
 			{
 				Console.WriteLine(format);
+				System.Diagnostics.Debug.WriteLine(format);
 			}
 		}
 
@@ -131,7 +133,7 @@ namespace IBDownloader
 			}
 		}
 
-		#endregion
+#endregion
 	}
 
 	class SettingsData
