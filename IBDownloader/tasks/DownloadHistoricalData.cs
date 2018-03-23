@@ -48,10 +48,11 @@ namespace IBDownloader.Tasks
 
 					var data = await _Controller.HistoricalDataManager.GetHistoricalData(
 						instruction.contract,
-						earliestDate.AddDays(i), 
+						earliestDate.AddDays(i),
 						barSize,
 						pageSize,
-						Managers.HistoricalDataType.TRADES);
+						Managers.HistoricalDataType.TRADES,
+						true);
 					this.Log("Downloaded {0} bars.", data.Count);
 
 					bars.AddRange(data);

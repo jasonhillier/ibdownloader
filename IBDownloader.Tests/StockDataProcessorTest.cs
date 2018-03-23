@@ -6,7 +6,7 @@ using Xunit;
 
 namespace IBDownloader.Tests
 {
-    public class StockDataProcessorTest
+    public class StockAndOptionDataProcessorTest
     {
 		[Fact]
 		public async void ProcessStockAndOptionQuote()

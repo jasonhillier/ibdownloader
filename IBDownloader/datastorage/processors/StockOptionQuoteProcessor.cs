@@ -42,12 +42,19 @@ namespace IBDownloader.DataStorage.Processors
 					Contract underlying = (Contract)metaUnderlying;
 					var quoteDate = (DateTime)Framework.ParseDateTz(quote.Date);
 
-					rows.Add(new StockOptionQuote(
-						taskResult.Instruction.contract,
-						underlying,
-						quote,
-						underlyingData[quoteDate]
-					));
+					if (underlyingData.ContainsKey(quoteDate))
+					{
+						rows.Add(new StockOptionQuote(
+							taskResult.Instruction.contract,
+							underlying,
+							quote,
+							underlyingData[quoteDate]
+						));
+					}
+					else
+					{
+						this.Log("Missing underlying quote at {0}", quoteDate);
+					}
 				}
 			}
 
@@ -60,7 +67,7 @@ namespace IBDownloader.DataStorage.Processors
 			public StockOptionQuote(Contract OptionContract, Contract Underlying, HistoricalDataMessage OptionQuote, HistoricalDataMessage StockQuote)
 				: base(OptionContract, Underlying, OptionQuote)
 			{
-				this.basePrice = StockQuote.Wap;
+				this.basePrice = StockQuote.Close;
 			}
 
 			public double basePrice { get; set; }
