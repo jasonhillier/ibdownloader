@@ -54,7 +54,7 @@ namespace IBDownloader.Managers
 				_ibClient.ClientSocket.reqHeadTimestamp(
 					requestId,
 					Contract,
-					"BID_ASK",
+					Contract.SecType == "OPT" ? "BID_ASK" : "TRADES",
 					UseRTH ? 1 : 0,
 					1);
 				return true;
