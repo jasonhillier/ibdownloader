@@ -44,7 +44,7 @@ namespace IBDownloader.Managers
 
 		public class Expiration
 		{
-			public enum Type { weekly, monthly, unknown };
+			public enum Type { weekly, monthly, any };
 			public Expiration(DateTime ExpirationDate)
 			{
 				Date = ExpirationDate;
@@ -57,7 +57,7 @@ namespace IBDownloader.Managers
 				else if (ExpirationDate.DayOfWeek == DayOfWeek.Monday)
 					ExpType = Type.weekly;
 				else
-					ExpType = Type.unknown;
+					ExpType = Type.any;
 			}
 
 			public Type ExpType { get; set; }

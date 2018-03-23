@@ -18,16 +18,21 @@ namespace IBDownloader.Tasks
 		public override async System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction instruction)
 		{
 			Managers.BarSize barSize = instruction.GetParameter("BarSize").ParseElse(Managers.BarSize.M15);
+			DateTime startDate = instruction.GetParameter("StartDate").ParseElse(DateTime.MinValue);
 
 			var selectedContracts = await _Controller.ContractManager.GetContractDetails(instruction.contract);
 			if (selectedContracts.Count < 1)
 				return TaskResultData.Failure(instruction, "No matching contracts found!");
 
-			DateTime earliestDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(instruction.contract);
+			DateTime earliestDate = startDate;
+			if (startDate == DateTime.MinValue)
+			{
+				earliestDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(instruction.contract);
+			}
 			earliestDate = earliestDate.StartOfDay();
 			TimeSpan duration = DateTime.Now.EndOfDay().AddDays(1) - earliestDate;
 
-			this.Log("Earliest date for {0} is {1}", instruction.ConId, earliestDate);
+			this.Log("Fetching data for {0} starting from {1}", instruction.ConId, earliestDate);
 
 			List<HistoricalDataMessage> bars = new List<HistoricalDataMessage>();
 			if (duration.TotalDays > 0)

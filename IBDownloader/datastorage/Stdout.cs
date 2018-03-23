@@ -17,7 +17,21 @@ namespace IBDownloader.DataStorage
 
 		public override void ProcessTaskResult(TaskResultData ResultData)
 		{
-			Framework.DebugPrint(ResultData.Data);
+			if (_dataProcessor != null)
+			{
+				base.ProcessTaskResult(ResultData);
+				return;
+			}
+
+			Framework.DebugPrint(ResultData);
+		}
+
+		protected override async Task ProcessQueue()
+		{
+			var rows = Dequeue();
+			Framework.DebugPrint(rows);
+
+			await Task.Delay(1);
 		}
 	}
 }

@@ -24,7 +24,7 @@ namespace IBDownloader.Tasks
 			List<IBDTaskInstruction> instructionSet = new List<IBDTaskInstruction>();
 			foreach(var optionContractId in (IEnumerable<int>)optionList.Data)
 			{
-				instructionSet.Add(new IBDTaskInstruction("DownloadOptionHistoricalData")
+				instructionSet.Add(new IBDTaskInstruction("DownloadStockAndOptionHistoricalData")
 				{
 					ConId = optionContractId
 				});

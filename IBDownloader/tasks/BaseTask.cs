@@ -53,7 +53,7 @@ namespace IBDownloader.Tasks
 			Instruction.contract = selectedContracts[0].Summary;
 			int underlyingConId = selectedContracts[0].UnderConId;
 			//lookup underlying
-			var underlying = await _Controller.ContractManager.GetContract(underlyingConId);
+			var underlying = await _Controller.ContractManager.GetContract(underlyingConId, string.Empty); //TODO: empty exchange may not always work
 			if (underlying == null)
 				return false;
 

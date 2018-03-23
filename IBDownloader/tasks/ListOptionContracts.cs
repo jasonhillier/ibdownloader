@@ -31,7 +31,7 @@ namespace IBDownloader.Tasks
 			}
 
 			OptionChain.Expiration.Type expType = instruction.GetParameter("filter.expirytype").ParseElse(OptionChain.Expiration.Type.monthly);
-			if (expType != OptionChain.Expiration.Type.unknown)
+			if (expType != OptionChain.Expiration.Type.any)
 				this.Log("Filtering to {0}s", expType);
 
 			int limitExpiries = instruction.GetParameter("filter.expiries").ParseElse(3);
@@ -47,7 +47,7 @@ namespace IBDownloader.Tasks
 				if (limitExpiries > 0 && expiryCounter > limitExpiries)
 					return true;
 
-				if (expType != OptionChain.Expiration.Type.unknown &&
+				if (expType != OptionChain.Expiration.Type.any &&
 					expiration.Value.ExpType != expType)
 				{
 					return true;

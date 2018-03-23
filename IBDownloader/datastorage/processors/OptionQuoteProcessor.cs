@@ -88,6 +88,15 @@ namespace IBDownloader.DataStorage.Processors
 			public double lowBid { get; set; }
 			public double ask { get; set; }
 
+			public double spread
+			{
+				get { return Math.Round(ask - bid, 2); }
+			}
+			public double mid
+			{
+				get { return Math.Round(bid + (spread / 2), 2); }
+			}
+
 			public string baseSymbol { get; set; }
 			public string baseType { get; set; }
 		}

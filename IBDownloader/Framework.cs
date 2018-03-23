@@ -120,6 +120,7 @@ namespace IBDownloader
 			{
 				//for scalars
 				Console.WriteLine(@object.ToString());
+				System.Diagnostics.Debug.WriteLine(@object.ToString());
 			}
 			else
 			{
@@ -128,7 +129,10 @@ namespace IBDownloader
 				{
 					var value = property.GetValue(@object, null);
 					if (value != null)
+					{
 						Console.WriteLine(property.Name + ": " + value.ToString());
+						System.Diagnostics.Debug.WriteLine(property.Name + ": " + value.ToString());
+					}
 				}
 			}
 		}

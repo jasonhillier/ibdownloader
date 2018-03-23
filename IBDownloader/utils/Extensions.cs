@@ -8,6 +8,20 @@ namespace IBDownloader
 {
 	internal static class Extensions
 	{
+		/// <summary>
+		/// Create a shallow copy of a dictionary
+		/// </summary>
+		public static Dictionary<A, B> Clone<A,B>(this Dictionary<A,B> Input)
+		{
+			var clonedCopy = new Dictionary<A, B>();
+			foreach(KeyValuePair<A,B> item in Input)
+			{
+				clonedCopy[item.Key] = item.Value;
+			}
+
+			return clonedCopy;
+		}
+
 		public static string ToISOString(this DateTime value)
 		{
 			return value.ToUniversalTime().ToString("o");

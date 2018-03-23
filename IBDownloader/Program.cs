@@ -59,7 +59,7 @@ namespace IBDownloader
 				}
 			}
 
-			var storage = new ElasticsearchStorage(new DataStorage.Processors.OptionsQuoteProcessor());
+			var storage = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			return storage;
