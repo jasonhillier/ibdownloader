@@ -51,78 +51,45 @@ namespace IBDownloader.DataStorage.Processors
 		//BID_ASK quote
 		public class OptionQuote : IDataRow
 		{
-			private Contract _Contract;
-			private Contract _Underlying;
-			private HistoricalDataMessage _Quote;
-
+			public OptionQuote() { }
 			public OptionQuote(Contract OptionContract, Contract Underlying, HistoricalDataMessage Quote)
 			{
-				_Contract = OptionContract;
-				_Underlying = Underlying;
-				_Quote = Quote;
+				this.symbol = OptionContract.LocalSymbol;
+				this.id = this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
+				this.type = OptionContract.SecType;
+				this.contractId = OptionContract.ConId;
+				this.date = DateTime.Parse(Quote.Date);
+				this.expiry = (DateTime)Framework.ParseDateTz(OptionContract.LastTradeDateOrContractMonth, DateTime.Now);
+				this.strike = OptionContract.Strike;
+				this.right = OptionContract.Right;
+				this.bid = Quote.Open;
+				this.maxAsk = Quote.High;
+				this.lowBid = Quote.Low;
+				this.ask = Quote.Close;
+				this.baseSymbol = Underlying.Symbol;
+				this.baseType = Underlying.SecIdType;
 			}
 
-			public string id
-			{
-				get
-				{
-					return this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
-				}
-			}
+			public string id { get; set; }
+			public string symbol { get; set; }
+			public string type { get; set; } //TODO: need to have normalized type names
+			public int contractId { get; set; }
 
-			public string symbol { get { return _Contract.LocalSymbol; } }
-			public string type { get { return _Contract.SecType; } } //TODO: need to have normalized type names
-			public int contractId {  get { return _Contract.ConId; } }
+			public DateTime date { get; set; }
+			public DateTime expiry { get; set; }
 
-			public DateTime date
-			{
-				get { return DateTime.Parse(_Quote.Date); }
-			}
+			public double strike { get; set; }
+			public string right { get; set; }
 
-			public DateTime expiry
-			{
-				get { return (DateTime)Framework.ParseDateTz(_Contract.LastTradeDateOrContractMonth, DateTime.Now); }
-			}
+			public double bid { get; set; }
 
-			public double strike
-			{
-				get { return _Contract.Strike; }
-			}
+			public double maxAsk { get; set; }
 
-			public string right
-			{
-				get { return _Contract.Right; }
-			}
+			public double lowBid { get; set; }
+			public double ask { get; set; }
 
-			public double bid
-			{
-				get { return _Quote.Open; }
-			}
-
-			public double maxAsk
-			{
-				get { return _Quote.High; }
-			}
-
-			public double lowBid
-			{
-				get { return _Quote.Low; }
-			}
-
-			public double ask
-			{
-				get { return _Quote.Close; }
-			}
-
-			public string baseSymbol
-			{
-				get { return _Underlying.Symbol; }
-			}
-
-			public string baseType
-			{
-				get { return _Underlying.SecType; }
-			}
+			public string baseSymbol { get; set; }
+			public string baseType { get; set; }
 		}
 	}
 }

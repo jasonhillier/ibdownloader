@@ -35,7 +35,7 @@ namespace IBDownloader.DataStorage.Processors
 			//TODO: make generic interface
 			if (storage is ElasticsearchStorage)
 			{
-				taskResult.Metadata["OptionQuotes"] = ((ElasticsearchStorage)storage).FetchQuotes(taskResult.Instruction.Symbol, DateTime.Now, DateTime.Now).Result;
+				taskResult.Metadata["OptionQuotes"] = ((ElasticsearchStorage)storage).FetchQuotes<OptionQuote>(taskResult.Instruction.Symbol, DateTime.Now, DateTime.Now).Result;
 			}
 		}
 
@@ -81,6 +81,7 @@ namespace IBDownloader.DataStorage.Processors
         
         public class StockOptionQuote : OptionQuote
 		{
+			public StockOptionQuote() : base() { }
             public StockOptionQuote(Contract OptionContract, Contract Underlying, HistoricalDataMessage OptionQuote, HistoricalDataMessage StockQuote)
                 : base(OptionContract, Underlying, OptionQuote)
 			{

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Net;
 using Nest;
 using Elasticsearch.Net;
+using System.Linq;
 
 namespace IBDownloader.DataStorage
 {
@@ -27,14 +28,13 @@ namespace IBDownloader.DataStorage
 			if (String.IsNullOrEmpty(this.Index))
 				throw new Exception("No elasticsearch index defined!");
 
-			/*
 			_client = new Nest.ElasticClient(new ConnectionSettings(
 				new Uri(this.Server))
 				.DefaultIndex(this.Index)
 				.BasicAuthentication(this.Username, this.Password)
 				.EnableHttpCompression()
 				);
-			*/
+			
 			this.Log("Elasticsearch URI: {0}", this.Server);
 			this.Log("Elasticsearch Index: {0}", this.Index);
 		}
@@ -114,10 +114,44 @@ namespace IBDownloader.DataStorage
 			return builder.ToString();
 		}
 
-		public async Task<List<IDataRow>> FetchQuotes(string Symbol, DateTime Start, DateTime End)
+		public async Task<IReadOnlyCollection<T>> FetchQuotes<T>(string Symbol, DateTime Start, DateTime End) where T : class, IDataRow, new()
 		{
-			await Task.Delay(1);
-			return new List<IDataRow>();
+			List<T> documents = new List<T>();
+
+			var search = await _client.SearchAsync<T>(s => s
+				.AllTypes()
+				.From(0)
+				.Size(10000)
+				.Query(q => q
+					.Match(m=>m
+						.Field(new Field("baseSymbol"))
+						.Query(Symbol)
+					) && q
+					.DateRange(r=> r
+						.Field(f=>f.date)
+						.GreaterThanOrEquals(Start)
+						.LessThanOrEquals(End)
+					)
+				)
+				.Scroll(100)
+			);
+
+			//first page
+			string scrollId = search.ScrollId;
+			documents.AddRange(search.Documents);
+
+			ISearchResponse<T> results;
+			do
+			{
+				//page until we get all the results
+				results = await _client.ScrollAsync<T>(100, scrollId);
+				scrollId = results.ScrollId;
+				documents.AddRange(results.Documents);
+			} while (results.Documents.Count == 10000);
+
+			this.Log("Retrieved {0} document objects.", documents.Count);
+
+			return documents;
 		}
 	}
 }

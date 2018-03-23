@@ -4,3 +4,4 @@ obj/
 launchSettings.json
 docker-compose.yml
 *.userprefs
+settings.json
