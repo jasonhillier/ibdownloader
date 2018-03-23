@@ -60,7 +60,7 @@ namespace IBDownloader
 		public dynamic datum { get; set; }
 	}
 
-    class IBDTaskHandler : IFrameworkLoggable
+   public class IBDTaskHandler : IFrameworkLoggable
     {
 		private int _TotalTaskCounter = 0; //count how many total tasks have been run
 		private ConcurrentQueue<IBDTaskInstruction> _TaskQueue = new ConcurrentQueue<IBDTaskInstruction>();

@@ -31,7 +31,7 @@ namespace IBDownloader.Tasks
 		}
 	}
 
-    abstract class BaseTask : IFrameworkLoggable
+    public abstract class BaseTask : IFrameworkLoggable
     {
 		protected IBDTaskHandler _TaskHandler;
 		protected IBController _Controller;
