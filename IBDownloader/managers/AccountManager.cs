@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace IBDownloader.Managers
 {
-    class AccountManager : BaseManager
+    public class AccountManager : BaseManager
 	{
-		public AccountManager(IBController Controller, IBClient ibClient)
+		internal AccountManager(IBController Controller, IBClient ibClient)
 			: base(Controller, ibClient)
 		{
 			_ibClient.AccountSummary += this.AppendPendingRequestData;

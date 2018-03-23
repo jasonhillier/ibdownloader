@@ -9,9 +9,9 @@ using IBDownloader.messages;
 
 namespace IBDownloader
 {
-	class IBController : IFrameworkLoggable
+	public class IBController : IFrameworkLoggable
 	{
-		protected IBClient _ibClient;
+		private protected IBClient _ibClient;
 		private EReaderMonitorSignal _signal = new EReaderMonitorSignal();
 
 		public IBController()
@@ -33,7 +33,7 @@ namespace IBDownloader
 		public HistoricalDataManager HistoricalDataManager { get; private set; }
 		public OptionManager OptionManager { get; private set; }
 
-		public void Connect()
+		public bool Connect()
 		{
 			try
 			{
@@ -52,11 +52,15 @@ namespace IBDownloader
 
 				//process incoming tcp data
 				new Thread(() => { while (_ibClient.ClientSocket.IsConnected()) { _signal.waitForSignal(); reader.processMsgs(); } }) { IsBackground = true }.Start();
+
+				//startup and connect ran fine
+				return true;
 			}
 			catch (Exception ex)
 			{
 				throw ex;
 				//HandleErrorMessage(new ErrorMessage(-1, -1, "Please check your connection attributes."));
+				return false;
 			}
 		}
 

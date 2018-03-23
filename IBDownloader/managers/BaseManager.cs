@@ -13,16 +13,16 @@ namespace IBDownloader.Managers
 	{
 		int RequestId { get; }
 	}
-	abstract class BaseManager : IFrameworkLoggable
+	public abstract class BaseManager : IFrameworkLoggable
 	{
 		const int WAIT_TIMEOUT = 600; //if no responses for x seconds
-		protected IBClient _ibClient;
+		private protected IBClient _ibClient;
 		protected IBController _Controller;
 		private static int _requestIdCounter = 1;
 		private ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>> _pendingRequestResults = new ConcurrentDictionary<int, ConcurrentBag<IBMultiMessageData>>();
 		private ConcurrentDictionary<int, DateTime> _pendingRequestStatus = new ConcurrentDictionary<int, DateTime>();
 
-		public BaseManager(IBController Controller, IBClient ibClient)
+		internal BaseManager(IBController Controller, IBClient ibClient)
 		{
 			_Controller = Controller;
 			_ibClient = ibClient;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IBDownloader
 {
-	class IBClient : EWrapper
+	internal class IBClient : EWrapper
 	{
 		private EClientSocket clientSocket;
 		private int nextOrderId;

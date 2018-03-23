@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace IBDownloader.Managers
 {
-	enum SecurityType
+	public enum SecurityType
 	{
 		STK,
 		OPT,
@@ -26,9 +26,9 @@ namespace IBDownloader.Managers
 		NEWS,
 		FUND
 	}
-	class ContractManager : BaseManager
+	public class ContractManager : BaseManager
 	{
-		public ContractManager(IBController Controller, IBClient ibClient)
+		internal ContractManager(IBController Controller, IBClient ibClient)
 			: base(Controller, ibClient)
 		{
 			_ibClient.ContractDetails += this.AppendPendingRequestData;

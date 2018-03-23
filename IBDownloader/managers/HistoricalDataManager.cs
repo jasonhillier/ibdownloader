@@ -11,13 +11,13 @@ using System.Linq;
 
 namespace IBDownloader.Managers
 {
-	enum HistoricalDataType
+	public enum HistoricalDataType
 	{
 		TRADES,
 		MIDPOINT,
 		BID_ASK
 	}
-	enum BarSize
+	public enum BarSize
 	{
 		[DescriptionAttribute("15 mins")]
 		M15,
@@ -35,9 +35,9 @@ namespace IBDownloader.Managers
 		Month
 	};
 
-	class HistoricalDataManager : BaseManager
+	public class HistoricalDataManager : BaseManager
 	{
-		public HistoricalDataManager(IBController Controller, IBClient ibClient)
+		internal HistoricalDataManager(IBController Controller, IBClient ibClient)
 			: base(Controller, ibClient)
 		{
 			_ibClient.HistoricalData += this.AppendPendingRequestData;

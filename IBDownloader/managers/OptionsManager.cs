@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace IBDownloader.Managers
 {
-	class OptionChain
+	public class OptionChain
 	{
 		public OptionChain(Contract Underlying)
 		{
@@ -67,9 +67,9 @@ namespace IBDownloader.Managers
 		}
 	}
 
-	class OptionManager : BaseManager
+	public class OptionManager : BaseManager
 	{
-		public OptionManager(IBController Controller, IBClient ibClient)
+		internal OptionManager(IBController Controller, IBClient ibClient)
 			: base(Controller, ibClient)
 		{
 			_ibClient.SecurityDefinitionOptionParameter += this.AppendPendingRequestData;

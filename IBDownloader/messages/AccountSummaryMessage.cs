@@ -7,7 +7,7 @@ using System.Text;
 
 namespace IBDownloader.messages
 {
-    class AccountSummaryMessage : Managers.IBMultiMessageData
+    public class AccountSummaryMessage : Managers.IBMultiMessageData
     {
         private int requestId;
         private string account;

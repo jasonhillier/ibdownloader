@@ -8,7 +8,7 @@ using IBApi;
 
 namespace IBDownloader.messages
 {
-    class AccountUpdateMultiMessage : Managers.IBMultiMessageData
+	public class AccountUpdateMultiMessage : Managers.IBMultiMessageData
 	{
         private int reqId;
         private string account;
