@@ -55,10 +55,10 @@ namespace IBDownloader.DataStorage.Processors
 			public OptionQuote(Contract OptionContract, Contract Underlying, HistoricalDataMessage Quote)
 			{
 				this.symbol = OptionContract.LocalSymbol;
-				this.id = this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
 				this.type = OptionContract.SecType;
 				this.contractId = OptionContract.ConId;
 				this.date = DateTime.Parse(Quote.Date);
+				this.id = this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
 				this.expiry = (DateTime)Framework.ParseDateTz(OptionContract.LastTradeDateOrContractMonth, DateTime.Now);
 				this.strike = OptionContract.Strike;
 				this.right = OptionContract.Right;
