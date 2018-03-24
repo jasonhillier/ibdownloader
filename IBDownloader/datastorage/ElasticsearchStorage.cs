@@ -153,5 +153,24 @@ namespace IBDownloader.DataStorage
 
 			return documents;
 		}
+
+		public async Task<long> DeleteQuotes(string Symbol, string idPattern)
+		{
+			var response = await _client.DeleteByQueryAsync<IDataRow>(s => s
+				.AllTypes()
+				.Query(q => q
+					.Match(m => m
+						.Field(new Field("baseSymbol"))
+						.Query(Symbol)
+					) && q
+					.Wildcard(z => z
+						.Field(f=>f.id)
+						.Value(idPattern)
+					)
+				)
+			);
+
+			return response.Deleted;
+		}
 	}
 }

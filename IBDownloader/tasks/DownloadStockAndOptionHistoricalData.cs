@@ -32,9 +32,8 @@ namespace IBDownloader.Tasks
 				var downloadTask = new DownloadHistoricalData(_TaskHandler);
 
 				var ins = new IBDTaskInstruction() { contract = underlying, parameters = optionInstruction.parameters.Clone() }; //clone parameters so we get same settings (barSize etc)
-				ins.parameters["StartDate"] = DateTime.Now.AddMonths(-6).ToString();
+				ins.parameters["StartDate"] = optionInstruction.GetParameter("StartDate").ParseElse(DateTime.Now.AddMonths(-6)).ToString();
 				var result = await downloadTask.ExecuteAsync(ins);
-
 
 				if (!result.HasData) //right now this is fatal
 					throw new Exception("No data found for underlying!");

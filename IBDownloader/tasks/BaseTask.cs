@@ -61,5 +61,18 @@ namespace IBDownloader.Tasks
 
 			return true;
 		}
+
+		public async System.Threading.Tasks.Task<DateTime> GetStartDate(IBDTaskInstruction Instruction)
+		{
+			DateTime startDate = Instruction.GetParameter("StartDate").ParseElse(DateTime.MinValue);
+
+			if (startDate == DateTime.MinValue)
+			{
+				startDate = await _Controller.HistoricalDataManager.GetEarliestDataTime(Instruction.contract);
+			}
+			startDate = startDate.StartOfDay();
+
+			return startDate;
+		}
 	}
 }
