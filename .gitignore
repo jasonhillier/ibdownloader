@@ -1,6 +1,7 @@
 bin/
 obj/
 .vs/
+.vscode/
 launchSettings.json
 docker-compose.yml
 *.userprefs
