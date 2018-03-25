@@ -3,6 +3,7 @@ using CsvHelper;
 using System.IO;
 using IBDownloader.messages;
 using System.Collections.Generic;
+using System.IO.Compression;
 
 namespace IBDownloader.Tasks
 {
@@ -26,11 +27,10 @@ namespace IBDownloader.Tasks
 				//is dir
 				var tmpFiles = Directory.GetFiles(filePathName);
 
-				//TODO: process zip files
-
 				foreach(string fileName in tmpFiles)
 				{
-					if (fileName.EndsWith("csv", StringComparison.InvariantCulture))
+					if (fileName.EndsWith("csv", StringComparison.InvariantCulture) ||
+						fileName.EndsWith("zip", StringComparison.InvariantCulture))
 						files.Add(fileName);
 				}
 			}
@@ -55,7 +55,21 @@ namespace IBDownloader.Tasks
 		{
 			IBApi.Contract underlyingContract = null;
 			Dictionary<string, List<CboeCsvRecord>> fileOptionQuotes = new Dictionary<string, List<CboeCsvRecord>>();
-			using (StreamReader fileStream = new StreamReader(File.OpenRead(CurrentFile)))
+
+			Stream stream;
+			if (CurrentFile.EndsWith("zip", StringComparison.InvariantCulture))
+			{
+				//TODO: support more than 1 file per archive
+				stream = ZipFile.OpenRead(CurrentFile).Entries[0].Open();
+			}
+			else
+			{
+				stream = File.OpenRead(CurrentFile);
+			}
+
+			this.Log("Processing {0}...", CurrentFile);
+
+			using (StreamReader fileStream = new StreamReader(stream))
             {
 				CsvReader reader = new CsvReader(fileStream);
 				foreach(var record in reader.GetRecords<CboeCsvRecord>())
@@ -134,7 +148,7 @@ namespace IBDownloader.Tasks
 					Right = this.option_type,
 					SecType = "OPT",
 					LocalSymbol = String.Format(
-					this.root + " {0}{1}0{2:00000000}",
+					this.root + " {0}{1}{2:00000000}",
 					this.expiration.ToString("yyMMdd"),
 					this.option_type,
 					this.strike*1000
