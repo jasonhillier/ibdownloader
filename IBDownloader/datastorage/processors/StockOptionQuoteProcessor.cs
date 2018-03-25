@@ -96,6 +96,17 @@ namespace IBDownloader.DataStorage.Processors
 				}
 			}
 
+			public double intr
+			{
+				get
+				{
+					if (!this.itm)
+						return 0;
+
+					return Math.Abs(this.strike - this.basePrice);
+				}
+			}
+
 			//extrinsic value
 			public double extr
 			{
