@@ -8,79 +8,109 @@ namespace IBDownloader.Tasks
 {
 	public class ImportCsv : BaseTask
     {
-		private Queue<string> _FileQueue = new Queue<string>();
-		private bool _IsPrepared = false;
-
 		public ImportCsv(IBDTaskHandler TaskHandler)
 			: base(TaskHandler)
         {
         }
 
-        //Indicate that this task wants repeated execution until no data is left
+		// Indicate that this task will handle firing result callback
 		public override bool IsMulti => true;
 
-		public override async System.Threading.Tasks.Task<TaskResultData> ExecuteMultiAsync(IBDTaskInstruction Instruction)
+		public override async System.Threading.Tasks.Task ExecuteMultiAsync(IBDTaskInstruction Instruction, Action<TaskResultData> OnTaskResult)
 		{
-			if (_IsPrepared)
-			{
-				return await ProcessFileAsync(Instruction);
-			}         
+			List<string> files = new List<string>();
 
 			var filePathName = Instruction.GetParameter("FilePathName");
 			if (Directory.Exists(filePathName))
 			{
 				//is dir
-				var files = Directory.GetFiles(filePathName);
+				var tmpFiles = Directory.GetFiles(filePathName);
 
 				//TODO: process zip files
 
-				foreach(string fileName in files)
+				foreach(string fileName in tmpFiles)
 				{
 					if (fileName.EndsWith("csv", StringComparison.InvariantCulture))
-					    _FileQueue.Enqueue(fileName);
+						files.Add(fileName);
 				}
 			}
 			else if (File.Exists(filePathName))
 			{
 				//is file
-				_FileQueue.Enqueue(filePathName);
+				files.Add(filePathName);
 			}
 			else
 			{
-				return TaskResultData.Failure(Instruction, "No files found in specified location!");
+				this.LogWarn("No files found in specified location!");
+				return;
 			}
 
-			_IsPrepared = true;
-			return await ProcessFileAsync(Instruction);
+			foreach (string file in files)
+			{
+				await ProcessFileAsync(Instruction, file, OnTaskResult);
+			}
 		}
 
-		protected async System.Threading.Tasks.Task<TaskResultData> ProcessFileAsync(IBDTaskInstruction Instruction)
+		protected async System.Threading.Tasks.Task ProcessFileAsync(IBDTaskInstruction Instruction, string CurrentFile, Action<TaskResultData> OnTakResult)
 		{
-			string currentFile;
-			if (!_FileQueue.TryDequeue(out currentFile))
-				return new TaskResultData(Instruction, false); //signal there is no data left
-
-			IEnumerable<CboeCsvRecord> records;
-			using (StreamReader fileStream = new StreamReader(File.OpenRead(currentFile)))
+			IBApi.Contract underlyingContract = null;
+			Dictionary<string, List<CboeCsvRecord>> fileOptionQuotes = new Dictionary<string, List<CboeCsvRecord>>();
+			using (StreamReader fileStream = new StreamReader(File.OpenRead(CurrentFile)))
             {
 				CsvReader reader = new CsvReader(fileStream);
-				while (reader.CanRead())
+				foreach(var record in reader.GetRecords<CboeCsvRecord>())
 				{
-					records = reader.GetRecords<CboeCsvRecord>();
+					if (underlyingContract == null)
+					{
+						underlyingContract = record.AsUnderlyingContract();
+					}
+					else if (underlyingContract.Symbol != record.AsUnderlyingContract().Symbol)
+					{
+						throw new Exception("Task does not support data with multiple underlying contracts!");
+					}
+
+					string optionLocalSymbol = record.AsOptionContract().LocalSymbol;
+					if (!fileOptionQuotes.ContainsKey(optionLocalSymbol))
+						fileOptionQuotes[optionLocalSymbol] = new List<CboeCsvRecord>();
+
+					fileOptionQuotes[optionLocalSymbol].Add(record);
 				}
             }
-            await System.Threading.Tasks.Task.Delay(1);
 
+			//grouped by option symbol/contract
+			foreach (var optionQuoteSet in fileOptionQuotes)
+			{
+				var underlyingQuotes = new Dictionary<DateTime, HistoricalDataMessage>();
+				var optionQuotes = new List<HistoricalDataMessage>();
+				foreach(CboeCsvRecord quote in optionQuoteSet.Value)
+				{
+					optionQuotes.Add(quote.AsOptionQuote());
 
-            TaskResultData results = new TaskResultData(Instruction, false);
-            return results;
+					var underlyingQuote = quote.AsUnderlyingQuote();
+					underlyingQuotes[underlyingQuote.Date.ParseElse<DateTime>(DateTime.Now)] = underlyingQuote;
+				}
+
+				var ins = new IBDTaskInstruction() { contract = optionQuoteSet.Value[0].AsOptionContract(), parameters = Instruction.parameters.Clone() }; //clone parameters so we get same settings (barSize etc)
+				ins.metadata[IBDMetadataType.underlying] = underlyingContract;
+				ins.metadata[IBDMetadataType.underlyingData] = underlyingQuotes;
+
+				var taskResult = new TaskResultData(ins, true, optionQuotes);
+
+				//fire event with this task result
+				OnTakResult(taskResult);
+
+				//give storage a second to keep up
+				await System.Threading.Tasks.Task.Delay(10);
+			}
 		}
 
 		//TODO: build library for these
         public interface CsvRecord
 		{
-			HistoricalDataMessage AsOptionQuote();
 			IBApi.Contract AsOptionContract();
+			IBApi.Contract AsUnderlyingContract();
+
+			HistoricalDataMessage AsOptionQuote();
 			HistoricalDataMessage AsUnderlyingQuote();
 		}
 
@@ -98,7 +128,22 @@ namespace IBDownloader.Tasks
 
 			public IBApi.Contract AsOptionContract()
 			{
-				return null;
+				return new IBApi.Contract() {
+					Strike = this.strike,
+					LastTradeDateOrContractMonth = this.expiration.ToString("yyyyMMdd"),
+					Right = this.option_type,
+					SecType = "OPT",
+					LocalSymbol = String.Format(
+					this.root + " {0}{1}0{2:00000000}",
+					this.expiration.ToString("yyMMdd"),
+					this.option_type,
+					this.strike*1000
+				)};
+			}
+
+			public IBApi.Contract AsUnderlyingContract()
+			{
+				return new IBApi.Contract() { Symbol = this.root };
 			}
 
             public HistoricalDataMessage AsOptionQuote()

@@ -18,7 +18,7 @@ namespace IBDownloader.Tests
             var taskHandler = new IBDTaskHandler(controller);
 
 			var instruction = new IBDTaskInstruction("ImportCsv");
-			instruction.parameters["FilePathName"] = "/Users/jasonhillier/Downloads/cboe";
+			instruction.parameters["FilePathName"] = "/Users/jason/Downloads/cboe";
             taskHandler.AddTask(instruction);
 
 			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());

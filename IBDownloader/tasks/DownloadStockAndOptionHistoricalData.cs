@@ -27,7 +27,7 @@ namespace IBDownloader.Tasks
 					throw new Exception("Failed to find derivative!");
 				}
 
-				var underlying = (Contract)optionInstruction.metadata["underlying"];
+				var underlying = (Contract)optionInstruction.metadata[IBDMetadataType.underlying];
 
 				var downloadTask = new DownloadHistoricalData(_TaskHandler);
 
@@ -45,7 +45,7 @@ namespace IBDownloader.Tasks
 				}
 			}
 
-			optionInstruction.metadata["UnderlyingData"] = _equityDataCache;
+			optionInstruction.metadata[IBDMetadataType.underlyingData] = _equityDataCache;
 		}
 
 		public override async System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction instruction)

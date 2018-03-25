@@ -34,7 +34,7 @@ namespace IBDownloader.DataStorage.Processors
 				if (taskResult.Instruction.contract.SecType == "OPT")
 				{
 					object metaUnderlying;
-					if (!taskResult.Instruction.metadata.TryGetValue("underlying", out metaUnderlying))
+					if (!taskResult.Instruction.metadata.TryGetValue(IBDMetadataType.underlying, out metaUnderlying))
 					{
 						this.Log("Missing underlying contract definition! Make sure the task sets required instruction metadata.");
 						continue;

@@ -10,6 +10,12 @@ using System.Threading;
 
 namespace IBDownloader
 {
+	public enum IBDMetadataType
+	{
+		underlying,
+		underlyingData
+	}
+
 	[Serializable]
 	public class IBDTaskInstruction
 	{
@@ -17,7 +23,7 @@ namespace IBDownloader
 		{
 			this.contract = new Contract() { Exchange = "SMART", Currency = "USD" };
 			this.parameters = new Dictionary<string, string>();
-			this.metadata = new Dictionary<string, object>();
+			this.metadata = new Dictionary<IBDMetadataType, object>();
 		}
 
 		public IBDTaskInstruction(string TaskType)
@@ -53,7 +59,7 @@ namespace IBDownloader
 			set { this.contract.ConId = value; }
 		}
 
-		public Dictionary<string, object> metadata { get; set; }
+		public Dictionary<IBDMetadataType, object> metadata { get; set; }
 		public Dictionary<string, string> parameters { get; set; }
 		public Contract contract { get; set; }
 		public string taskType { get; set; }
@@ -155,43 +161,46 @@ namespace IBDownloader
 							continue;
 						}
 
-						TaskResultData resultData;
-						do //will repeat for multi-type tasks
+						TaskResultData resultData = null;
+						try
 						{
-							resultData = null;
+							if (task.IsMulti)
+							{
+								if (this.OnTaskResult == null)
+									throw new Exception("No task result handler was defined!"); //fatal
+
+								await task.ExecuteMultiAsync(instruction, this.OnTaskResult);
+							}
+							else
+							{
+								resultData = await task.ExecuteAsync(instruction);
+							}
+						}
+						catch (Exception ex)
+						{
+							this.LogError("Error in task for instruction {0}", instruction.taskType);
+							this.LogError(ex.Message);
+							this.LogError(ex.StackTrace);
+							return;
+						}
+
+						if (resultData != null)
+						{
+							this.Log("Completed task for instruction {0}", instruction.taskType);
+
 							try
 							{
-								if (task.IsMulti)
-									resultData = await task.ExecuteMultiAsync(instruction);
-								else
-									resultData = await task.ExecuteAsync(instruction);
+								if (this.OnTaskResult != null)
+									this.OnTaskResult(resultData);
 							}
 							catch (Exception ex)
 							{
-								this.LogError("Error in task for instruction {0}", instruction.taskType);
+								this.LogError("Error in processing task result for instruction {0}", instruction.taskType);
 								this.LogError(ex.Message);
 								this.LogError(ex.StackTrace);
 								return;
 							}
-
-							if (resultData != null)
-							{
-								this.Log("Completed task for instruction {0}", instruction.taskType);
-
-								try
-								{
-									if (this.OnTaskResult != null)
-										this.OnTaskResult(resultData);
-								}
-								catch (Exception ex)
-								{
-									this.LogError("Error in processing task result for instruction {0}", instruction.taskType);
-									this.LogError(ex.Message);
-									this.LogError(ex.StackTrace);
-									return;
-								}
-							}
-						} while (task.IsMulti && resultData != null && resultData.HasData);
+						}
 					}
 				}
 			}

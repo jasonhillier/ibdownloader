@@ -39,7 +39,11 @@ namespace IBDownloader
 			{
 				string host = Framework.Settings.Get("IB_HOST", "localhost");
 				int port = Framework.Settings.Get("IB_PORT", 4001);
+#if DEBUG
+				int clientId = Framework.Settings.Get("IB_CLIENTID", 1);
+#else
 				int clientId = Framework.Settings.Get("IB_CLIENTID", 11);
+#endif
 
 				this.Log("Connecting to IB gateway on {0}:{1}... (client_id={2})", host, port, clientId);
 

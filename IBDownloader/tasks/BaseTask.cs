@@ -18,13 +18,14 @@ namespace IBDownloader.Tasks
 		public bool HasData { get; set; }
 		public object Data { get; set; }
 
+		[Obsolete] //TODO: refactor this stuff
 		public Dictionary<string, object> Metadata {get;set;}
 
 		public static TaskResultData Failure(IBDTaskInstruction Instruction, string Message = null)
 		{
 			if (!string.IsNullOrEmpty(Message))
 			{
-				Framework.LogError("Task failed: " + Message);
+				Framework.LogError("[{0}] Task failed: {1}", Instruction.taskType, Message);
 			}
 
 			return new TaskResultData(Instruction, false);
@@ -43,7 +44,7 @@ namespace IBDownloader.Tasks
 		}
         
         /// <summary>
-		/// Indicate if this task wants repeated execution until no data is left
+		/// Indicate if this task will handle firing result callback
         /// </summary>
 		public virtual bool IsMulti { get { return false; } }
 
@@ -52,8 +53,8 @@ namespace IBDownloader.Tasks
 			throw new NotImplementedException("Check if IsMulti flag is set according to implemented Execute method!");
 		}
 
-		public virtual System.Threading.Tasks.Task<TaskResultData> ExecuteMultiAsync(IBDTaskInstruction Instruction)
-        {
+		public virtual System.Threading.Tasks.Task ExecuteMultiAsync(IBDTaskInstruction Instruction, Action<TaskResultData> OnTaskResult)
+		{
 			throw new NotImplementedException("Check if IsMulti flag is set according to implemented Execute method!");
         }
 
@@ -70,7 +71,7 @@ namespace IBDownloader.Tasks
 			if (underlying == null)
 				return false;
 
-			Instruction.metadata["underlying"] = underlying;
+			Instruction.metadata[IBDMetadataType.underlying] = underlying;
 
 			return true;
 		}

@@ -16,7 +16,7 @@ namespace IBDownloader.DataStorage.Processors
 		{
 			return (
 				base.CheckIfSupported(taskResult) &&
-				taskResult.Instruction.metadata.ContainsKey("UnderlyingData")
+				taskResult.Instruction.metadata.ContainsKey(IBDMetadataType.underlyingData)
 			);
 		}
 
@@ -25,7 +25,7 @@ namespace IBDownloader.DataStorage.Processors
 			if (!CheckIfSupported(taskResult))
 				return null;
 
-			 var underlyingData = (Dictionary<DateTime, HistoricalDataMessage>)taskResult.Instruction.metadata["UnderlyingData"];
+			 var underlyingData = (Dictionary<DateTime, HistoricalDataMessage>)taskResult.Instruction.metadata[IBDMetadataType.underlyingData];
 
 			List<IDataRow> rows = new List<IDataRow>();
 			foreach (var quote in (IEnumerable<HistoricalDataMessage>)taskResult.Data)
@@ -34,7 +34,7 @@ namespace IBDownloader.DataStorage.Processors
 				if (taskResult.Instruction.contract.SecType == "OPT")
 				{
 					object metaUnderlying;
-					if (!taskResult.Instruction.metadata.TryGetValue("underlying", out metaUnderlying))
+					if (!taskResult.Instruction.metadata.TryGetValue(IBDMetadataType.underlying, out metaUnderlying))
 					{
 						this.Log("Missing underlying contract definition! Make sure the task sets required instruction metadata.");
 						continue;
