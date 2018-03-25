@@ -41,8 +41,21 @@ namespace IBDownloader.Tasks
 			_TaskHandler = TaskHandler;
 			_Controller = _TaskHandler.Controller;
 		}
+        
+        /// <summary>
+		/// Indicate if this task wants repeated execution until no data is left
+        /// </summary>
+		public virtual bool IsMulti { get { return false; } }
 
-		public abstract System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction Instruction);
+		public virtual System.Threading.Tasks.Task<TaskResultData> ExecuteAsync(IBDTaskInstruction Instruction)
+		{
+			throw new NotImplementedException("Check if IsMulti flag is set according to implemented Execute method!");
+		}
+
+		public virtual System.Threading.Tasks.Task<TaskResultData> ExecuteMultiAsync(IBDTaskInstruction Instruction)
+        {
+			throw new NotImplementedException("Check if IsMulti flag is set according to implemented Execute method!");
+        }
 
 		public async System.Threading.Tasks.Task<bool> LookupDerivative(IBDTaskInstruction Instruction)
 		{

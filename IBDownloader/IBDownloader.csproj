@@ -17,6 +17,7 @@
     <PackageReference Include="NEST" Version="6.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+    <PackageReference Include="CsvHelper" Version="7.1.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -155,36 +155,43 @@ namespace IBDownloader
 							continue;
 						}
 
-						TaskResultData resultData = null;
-						try
+						TaskResultData resultData;
+						do //will repeat for multi-type tasks
 						{
-							resultData = await task.ExecuteAsync(instruction);
-						}
-						catch (Exception ex)
-						{
-							this.LogError("Error in task for instruction {0}", instruction.taskType);
-							this.LogError(ex.Message);
-							this.LogError(ex.StackTrace);
-							return;
-						}
-
-						if (resultData != null)
-						{
-							this.Log("Completed task for instruction {0}", instruction.taskType);
-
+							resultData = null;
 							try
 							{
-								if (this.OnTaskResult != null)
-									this.OnTaskResult(resultData);
+								if (task.IsMulti)
+									resultData = await task.ExecuteMultiAsync(instruction);
+								else
+									resultData = await task.ExecuteAsync(instruction);
 							}
 							catch (Exception ex)
 							{
-								this.LogError("Error in processing task result for instruction {0}", instruction.taskType);
+								this.LogError("Error in task for instruction {0}", instruction.taskType);
 								this.LogError(ex.Message);
 								this.LogError(ex.StackTrace);
 								return;
 							}
-						}
+
+							if (resultData != null)
+							{
+								this.Log("Completed task for instruction {0}", instruction.taskType);
+
+								try
+								{
+									if (this.OnTaskResult != null)
+										this.OnTaskResult(resultData);
+								}
+								catch (Exception ex)
+								{
+									this.LogError("Error in processing task result for instruction {0}", instruction.taskType);
+									this.LogError(ex.Message);
+									this.LogError(ex.StackTrace);
+									return;
+								}
+							}
+						} while (task.IsMulti && resultData != null && resultData.HasData);
 					}
 				}
 			}
