@@ -60,6 +60,7 @@ namespace IBDownloader.DataStorage.Processors
 				this.date = DateTime.Parse(Quote.Date);
 				this.id = this.symbol + " " + this.date.ToString("yyyy-MM-ddTHH:mm:ssZ"); //fixed-length ISO string
 				this.expiry = (DateTime)Framework.ParseDateTz(OptionContract.LastTradeDateOrContractMonth, DateTime.Now);
+				this.daysExp = (int)(this.expiry - this.date).TotalDays;
 				this.strike = OptionContract.Strike;
 				this.right = OptionContract.Right;
 				this.bid = Quote.Open;
@@ -77,6 +78,7 @@ namespace IBDownloader.DataStorage.Processors
 
 			public DateTime date { get; set; }
 			public DateTime expiry { get; set; }
+			public int daysExp { get; set; }
 
 			public double strike { get; set; }
 			public string right { get; set; }
