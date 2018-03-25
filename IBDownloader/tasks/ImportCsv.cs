@@ -33,6 +33,8 @@ namespace IBDownloader.Tasks
 						fileName.EndsWith("zip", StringComparison.InvariantCulture))
 						files.Add(fileName);
 				}
+
+				files.Sort();
 			}
 			else if (File.Exists(filePathName))
 			{
@@ -56,11 +58,13 @@ namespace IBDownloader.Tasks
 			IBApi.Contract underlyingContract = null;
 			Dictionary<string, List<CboeCsvRecord>> fileOptionQuotes = new Dictionary<string, List<CboeCsvRecord>>();
 
+			ZipArchive zipFile = null;
 			Stream stream;
 			if (CurrentFile.EndsWith("zip", StringComparison.InvariantCulture))
 			{
 				//TODO: support more than 1 file per archive
-				stream = ZipFile.OpenRead(CurrentFile).Entries[0].Open();
+				zipFile = ZipFile.OpenRead(CurrentFile);
+				stream = zipFile.Entries[0].Open();
 			}
 			else
 			{
@@ -69,8 +73,9 @@ namespace IBDownloader.Tasks
 
 			this.Log("Processing {0}...", CurrentFile);
 
-			using (StreamReader fileStream = new StreamReader(stream))
+			using (stream)
             {
+				StreamReader fileStream = new StreamReader(stream);
 				CsvReader reader = new CsvReader(fileStream);
 				foreach(var record in reader.GetRecords<CboeCsvRecord>())
 				{
@@ -90,6 +95,10 @@ namespace IBDownloader.Tasks
 					fileOptionQuotes[optionLocalSymbol].Add(record);
 				}
             }
+			if (zipFile != null)
+			{
+				zipFile.Dispose();
+			}
 
 			//grouped by option symbol/contract
 			foreach (var optionQuoteSet in fileOptionQuotes)
