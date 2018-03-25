@@ -29,8 +29,11 @@ namespace IBDownloader
 				case "optiontasks":
 					storage = BuildOptionDownloadTasks(taskHandler, args[1], args[2]);
 					break;
+				case "importcsv":
+					storage = ImportCsv(taskHandler, args[1]);
+					break;
 				default:
-					throw new Exception("No commands specified! Try runtaskfile or optiontasks");
+					throw new Exception("No commands specified! Try runtaskfile, optionwithstock, optiontasks, importcsv");
 					break;
 			}
 
@@ -63,6 +66,18 @@ namespace IBDownloader
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			return storage;
+		}
+
+		static BaseDataStorage ImportCsv(IBDTaskHandler TaskHandler, string FilePathName)
+		{
+			var instruction = new IBDTaskInstruction("ImportCsv");
+			instruction.parameters["FilePathName"] = FilePathName;
+			TaskHandler.AddTask(instruction);
+
+			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
+			TaskHandler.OnTaskResult += es.ProcessTaskResult;
+
+			return es;
 		}
 
 		static BaseDataStorage BuildOptionDownloadTasks(IBDTaskHandler TaskHandler, string pSymbol, string FilePathName)
