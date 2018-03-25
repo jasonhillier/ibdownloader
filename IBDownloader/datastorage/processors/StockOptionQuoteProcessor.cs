@@ -119,7 +119,9 @@ namespace IBDownloader.DataStorage.Processors
 					//itm
 					double result = this.mid - Math.Abs(this.strike - this.basePrice);
 
-					return result > 0 ? result : 0;
+					//it is possible to have negative extrinsic value
+					// TODO: see if we can figure euro/american and dividends
+					return result;
 				}
 			}
 		}
