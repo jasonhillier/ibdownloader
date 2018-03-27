@@ -69,6 +69,7 @@ namespace IBDownloader.DataStorage.Processors
 				this.ask = Quote.Close;
 				this.baseSymbol = Underlying.Symbol;
 				this.baseType = Underlying.SecIdType;
+				this.volume = Quote.Volume;
 			}
 
 			public string id { get; set; }
@@ -89,6 +90,7 @@ namespace IBDownloader.DataStorage.Processors
 
 			public double lowBid { get; set; }
 			public double ask { get; set; }
+			public long volume { get; set; }
 
 			public double spread
 			{

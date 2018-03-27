@@ -148,6 +148,7 @@ namespace IBDownloader.Tasks
 			public double ask { get; set; }
 			public double underlying_bid { get; set; }
 			public double underlying_ask { get; set; }
+			public long trade_volume { get; set; }
 
 			public IBApi.Contract AsOptionContract()
 			{
@@ -177,7 +178,7 @@ namespace IBDownloader.Tasks
 					this.ask,
 					this.bid,
 					this.ask,
-					0,
+					this.trade_volume,
 					0,
 					0
 				));
