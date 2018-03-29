@@ -117,6 +117,27 @@ namespace IBDownloader
 		}
 
 		/// <summary>
+		/// Add tasks from output of another tasks results
+		/// </summary>
+		public void AddTasks(TaskResultData taskResultData)
+		{
+			if (!taskResultData.HasData)
+				return;
+
+			if (taskResultData.Data is IBDTaskInstruction)
+			{
+				AddTask((IBDTaskInstruction)taskResultData.Data);
+			}
+			else if (taskResultData.Data is IEnumerable<IBDTaskInstruction>)
+			{
+				foreach(var ins in (IEnumerable<IBDTaskInstruction>)taskResultData.Data)
+				{
+					AddTask(ins);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Add task to queue
 		/// </summary>
 		public void AddTask(IBDTaskInstruction Task)
