@@ -36,8 +36,11 @@ namespace IBDownloader
 					string secType = (args.Length > 2) ? args[3] : "STK";
 					storage = DownloadOptions(taskHandler, args[1], secType);
 					break;
+				case "cronfile":
+					storage = CronFile(taskHandler, args[1]);
+					break;
 				default:
-					throw new Exception("No commands specified! Try runtaskfile, optionwithstock, optiontasks, importcsv, downloadoptions");
+					throw new Exception("No commands specified! Try runtaskfile, optionwithstock, optiontasks, importcsv, downloadoptions, cronfile");
 			}
 
 			taskHandler.BeginAsync().Wait();
@@ -47,6 +50,17 @@ namespace IBDownloader
 #if DEBUG
 			Console.ReadLine();
 #endif
+		}
+
+		static BaseDataStorage CronFile(IBDTaskHandler TaskHandler, string FilePathName)
+		{
+			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
+			TaskHandler.OnTaskResult += es.ProcessTaskResult;
+
+			var cronSchedule = new CronScheduler(TaskHandler);
+			cronSchedule.RunFileAsync(FilePathName).Wait();
+
+			return es;
 		}
 
 		static BaseDataStorage DownloadOptions(IBDTaskHandler TaskHandler, string Symbol, string SecurityType)
