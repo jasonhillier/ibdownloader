@@ -59,7 +59,7 @@ namespace IBDownloader
 				DateTime moment = this.Expression.GetNextOccurrence(DateTime.Now);
 
 				//should be right on the money
-				if ((DateTime.Now - moment).TotalMinutes < 1)
+				if ((int)(DateTime.Now - moment).TotalMinutes == 0)
 				{
 					return true;
 				}

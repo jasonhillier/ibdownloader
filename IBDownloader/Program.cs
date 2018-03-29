@@ -57,6 +57,8 @@ namespace IBDownloader
 			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
 			TaskHandler.OnTaskResult += es.ProcessTaskResult;
 
+			TaskHandler.Begin();
+
 			var cronSchedule = new CronScheduler(TaskHandler);
 			cronSchedule.RunFileAsync(FilePathName).Wait();
 
