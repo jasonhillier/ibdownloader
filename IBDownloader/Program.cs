@@ -33,7 +33,7 @@ namespace IBDownloader
 					storage = ImportCsv(taskHandler, args[1]);
 					break;
 				case "downloadoptions":
-					string secType = (args.Length > 1) ? args[2] : "STK";
+					string secType = (args.Length > 2) ? args[3] : "STK";
 					storage = DownloadOptions(taskHandler, args[1], secType);
 					break;
 				default:
