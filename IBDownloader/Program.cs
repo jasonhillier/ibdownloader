@@ -56,6 +56,7 @@ namespace IBDownloader
 		{
 			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
 			TaskHandler.OnTaskResult += es.ProcessTaskResult;
+			TaskHandler.OnTaskResult += TaskHandler.AddTasks; //enable task chaining
 
 			TaskHandler.Begin();
 
@@ -68,7 +69,7 @@ namespace IBDownloader
 		static BaseDataStorage DownloadOptions(IBDTaskHandler TaskHandler, string Symbol, string SecurityType)
 		{
 			TaskHandler.AddTask(new IBDTaskInstruction("BuildOptionDownloadTasks") { Symbol = Symbol, SecType = SecurityType });
-			TaskHandler.OnTaskResult += TaskHandler.AddTasks;
+			TaskHandler.OnTaskResult += TaskHandler.AddTasks; //enable task chaining
 
 			ElasticsearchStorage es = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
 			TaskHandler.OnTaskResult += es.ProcessTaskResult;
