@@ -10,10 +10,19 @@ namespace IBDownloader
     {
 		static void Main(string[] args)
         {
-			var controller = new IBController();
-			controller.Connect();
+			IBDTaskHandler taskHandler;
 
-			var taskHandler = new IBDTaskHandler(controller);
+			if (args.Length < 3 || args[2] != "--noib")
+			{
+				var controller = new IBController();
+				controller.Connect();
+
+				taskHandler = new IBDTaskHandler(controller);
+			}
+			else
+			{
+				taskHandler = new IBDTaskHandler();
+			}
 
 			BaseDataStorage storage;
 
@@ -93,7 +102,8 @@ namespace IBDownloader
 				}
 			}
 
-			var storage = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
+			//var storage = new ElasticsearchStorage(new DataStorage.Processors.StockOptionQuoteProcessor());
+			var storage = new ElasticsearchStorage(new DataStorage.Processors.DirectProcessor());
 			TaskHandler.OnTaskResult += storage.ProcessTaskResult;
 
 			return storage;

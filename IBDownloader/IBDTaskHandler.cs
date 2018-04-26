@@ -73,7 +73,7 @@ namespace IBDownloader
 		private bool _pendingTasks = false;
 		private bool _AbortFlag;
 
-		public IBDTaskHandler(IBController Controller)
+		public IBDTaskHandler(IBController Controller = null)
 		{
 			this.Controller = Controller;
 		}
@@ -154,7 +154,7 @@ namespace IBDownloader
 			{
 				await System.Threading.Tasks.Task.Delay(100);
 
-				if (!this.Controller.IsConnected)
+				if (this.Controller != null && !this.Controller.IsConnected)
 					continue;
 
 				if (_TaskQueue.Count == 0)

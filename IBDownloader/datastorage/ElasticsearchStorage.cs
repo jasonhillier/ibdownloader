@@ -60,7 +60,7 @@ namespace IBDownloader.DataStorage
 			if (String.IsNullOrEmpty(dataPackage))
 				return false;
 
-			this.Log("Sending " + dataPackage.Length + " bytes...");
+			this.Log("Sending {0} bytes to {1}...", dataPackage.Length, this.Index);
 
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(this.Server + "/_bulk");
 
